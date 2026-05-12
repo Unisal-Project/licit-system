@@ -4,6 +4,8 @@ import "./ProcurementList.css";
 import { useNavigate } from "react-router-dom";
 import { Button, Input } from "../../components/ui/main.js";
 import { procurements } from "../../database/procurements.js";
+import { statusOptions, tipoOptions, origemOptions, filterProcurements, paginateItems, getStatusColor } from "../../components/shared/procurementListUtils.js";
+import { getCurrentProcurementStatus } from "../../components/shared/procurementDeadline.js"
 
 function ProcurementList() {
     const navigate = useNavigate();
@@ -21,40 +23,6 @@ function ProcurementList() {
     const [itemsPerPage, setItemsPerPage] = useState(6);
 
     const dropdownRef = useRef();
-
-    const statusOptions = [
-        { label: "Aberto", dotClass: "green" },
-        { label: "Em Andamento", dotClass: "blue", extraClass: "large-status" },
-        { label: "Suspenso", dotClass: "red" },
-        { label: "Revogado", dotClass: "orange" },
-        { label: "Finalizado", dotClass: "dark" },
-    ];
-
-    const tipoOptions = [
-        { label: "Pregão Eletrônico", value: "Pregao Eletronico" },
-        { label: "Concorrência Pública", value: "Concorrencia Publica" },
-    ];
-
-    const origemOptions = [
-        "SEGOV",
-        "SEFAZ",
-        "SEAD",
-        "SEFI",
-        "SEMEC",
-        "SEMUS",
-        "SEESP",
-        "SMSP",
-        "SEAS",
-        "SEPCD",
-        "SEMDH",
-        "SEC",
-        "SEPP",
-        "SEOS",
-        "SEMA",
-        "SEDU",
-        "SEDET",
-        "SEAJ",
-    ];
 
     const toggleFilter = (currentValue, selectedValue, setter) => {
         setter(currentValue === selectedValue ? "" : selectedValue);
@@ -86,63 +54,50 @@ function ProcurementList() {
         };
     }, []);
 
-    const filteredProcurements = procurements.filter((item) => {
-        const matchesStatus = selectedStatus ? item.status === selectedStatus : true;
-        const matchesTipo = selectedTipo ? item.tipo === selectedTipo : true;
-        const matchesOrigem = selectedOrigem ? item.origem === selectedOrigem : true;
-
-        return matchesStatus && matchesTipo && matchesOrigem;
-    });
-
-    const totalPages = Math.ceil(filteredProcurements.length / itemsPerPage);
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredProcurements.slice(indexOfFirstItem, indexOfLastItem);
-
     useEffect(() => {
         setCurrentPage(1);
     }, [selectedStatus, selectedTipo, selectedOrigem]);
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case "Aberto":
-                return "#16A34A";
-            case "Em Andamento":
-                return "#2563EB";
-            case "Suspenso":
-                return "#DC2626";
-            case "Revogado":
-                return "#F59E0B";
-            case "Finalizado":
-                return "#1F2937";
-            default:
-                return "#ffffff";
-        }
+    const filters = {
+        status: selectedStatus,
+        tipo: selectedTipo,
+        origem: selectedOrigem,
     };
+
+    const filteredProcurements = filterProcurements(
+        procurements,
+        filters
+    );
+
+    const { totalPages, currentItems } = paginateItems(
+        filteredProcurements,
+        currentPage,
+        itemsPerPage
+    );
 
     useEffect(() => {
-    const handleClickOutside = (event) => {
-        if (
-            dropdownRef.current &&
-            !dropdownRef.current.contains(event.target)
-        ) {
-            setShowFilter(false);
-        }
-    };
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
+                setShowFilter(false);
+            }
+        };
 
-    document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
 
-    return () => {
-        document.removeEventListener(
-            "mousedown",
-            handleClickOutside
-        );
-    };
-}, []);
+        return () => {
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+        };
+    }, []);
 
     return (
         <div className="page">
-            <Sidebar />
+            <Sidebar/>
 
             <div className="content">
                 <div className="top-bar">
@@ -290,19 +245,23 @@ function ProcurementList() {
                 <div className="table-container">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Número/Ano</th>
-                                <th>Tipo</th>
-                                <th>Origem</th>
-                                <th>Publicação</th>
-                                <th>Abertura</th>
-                                <th>Status</th>
-                            </tr>
+                        <tr>
+                            <th>Número/Ano</th>
+                            <th>Tipo</th>
+                            <th>Origem</th>
+                            <th>Publicação</th>
+                            <th>Abertura</th>
+                            <th>Status</th>
+                        </tr>
                         </thead>
 
                         <tbody>
-                            {currentItems.length > 0 ? (
-                                currentItems.map((item) => (
+                        {currentItems.length > 0 ? (
+                            currentItems.map((item) => {
+
+                                const currentStatus = getCurrentProcurementStatus(item);
+
+                                return (
                                     <tr
                                         key={item.id}
                                         className="table-row-clickable"
@@ -319,19 +278,20 @@ function ProcurementList() {
                                             <span
                                                 className="status-dot"
                                                 style={{
-                                                    backgroundColor: getStatusColor(item.status),
+                                                    backgroundColor: getStatusColor(currentStatus),
                                                 }}
                                             ></span>
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="6">
-                                        Nenhuma licitação encontrada.
-                                    </td>
-                                </tr>
-                            )}
+                                );
+                            })
+                        ) : (
+                            <tr>
+                                <td colSpan="6">
+                                    Nenhuma licitação encontrada.
+                                </td>
+                            </tr>
+                        )}
                         </tbody>
                     </table>
                 </div>

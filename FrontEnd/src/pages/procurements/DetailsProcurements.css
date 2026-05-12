@@ -2,16 +2,21 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 .procurement-page {
   min-height: 100vh;
-  background: var(--bg-light);
+  background: var(--bg);
 }
 
 .procurement-main {
   min-height: 100vh;
-  margin-left: var(--sidebar-width);
+  margin-left: 150px;
   padding: 34px 38px;
-  background: var(--bg-light);
+  background: var(--bg);
 }
 
 .page-header {
@@ -32,6 +37,7 @@
   width: 58px;
   height: 58px;
   border-radius: 14px;
+  border: none;
   background: #e5e7eb;
   color: var(--text-primary);
 
@@ -41,6 +47,7 @@
 
   text-decoration: none;
   transition: 0.2s ease;
+  flex-shrink: 0;
 }
 
 .back-button:hover {
@@ -80,9 +87,6 @@
   max-width: 1600px;
   min-height: 650px;
 
-  position: relative;
-  top: 50px;
-
   margin: 0 auto;
   padding: 28px 26px 30px;
 
@@ -119,6 +123,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .btn {
@@ -162,10 +167,7 @@
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 24px;
-
-  position: relative;
-  top: 30px;
+  gap: 20px;
 }
 
 .span-3 {
@@ -186,7 +188,6 @@
   gap: 18px;
 }
 
-/* Cards inferiores menores */
 .compact-card {
   min-height: 155px;
   max-height: 195px;
@@ -218,7 +219,7 @@
 }
 
 .countdown-days {
-  font-size: 40px;
+  font-size: 28px;
   font-weight: 800;
   line-height: 0.85;
   color: var(--secondary);
@@ -266,11 +267,10 @@
 @media (max-width: 1440px) {
   .procurement-main {
     padding: 24px 28px;
+    margin-top: 15px;
   }
 
   .page-header {
-    position: relative;
-    right: 20px;
     margin-bottom: 28px;
     gap: 16px;
   }
@@ -287,13 +287,10 @@
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    flex-shrink: 0;
   }
 
   .details-container {
-    top: -10px;
-    right: 20px;
-
+    margin-top: -10px;
     max-width: 100%;
     min-height: auto;
 
@@ -325,30 +322,51 @@
 
   .details-actions {
     gap: 10px;
-    flex-shrink: 0;
   }
 
   .cards-grid {
-    top: -5px;
     gap: 10px;
-    grid-template-columns: repeat(12, 1fr);
   }
 
-  .compact-card {
+  .deadline-card.compact-card {
+    width: 100%;
     min-height: 135px;
-    max-height: 155px;
+    max-height: 160px;
   }
 
-  .compact-card-content {
-    gap: 6px;
+  .deadline-card .compact-card-content {
+    margin-top: -10px;
   }
 
-  .countdown-days {
-    font-size: 28px;
+  .deadline-card .countdown-compact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 
-  .countdown-label,
-  .countdown-text {
-    font-size: 13px;
+  .deadline-card .countdown-label {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .deadline-card .countdown-line {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .deadline-card .countdown-days {
+    padding: 0;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .deadline-card .countdown-text {
+    margin-top: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    line-height: 1.2;
   }
 }

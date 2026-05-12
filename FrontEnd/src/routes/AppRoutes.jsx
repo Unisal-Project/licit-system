@@ -22,13 +22,10 @@ function AppRoutes() {
 
                 <Route path="/procurements" element={<ProcurementList />} />
                 <Route path="/procurements/create" element={<CreateProcurements />} />
-                <Route path="/procurements/edit/" element={<EditProcurements />} />
+                <Route path="/procurements/edit/:id" element={<EditProcurements />} />
                 <Route path="/procurements/:id" element={<DetailsProcurements />} />
 
-                <Route
-                    path="/CreateProcurements"
-                    element={<Navigate to="/procurements/create" replace />}
-                />
+                <Route path="/CreateProcurements"element={<Navigate to="/procurements/create" replace />}/>
 
                 <Route path="/remote-access" element={<RemoteAccess />} />
 

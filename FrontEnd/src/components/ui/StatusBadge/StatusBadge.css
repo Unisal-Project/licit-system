@@ -31,6 +31,11 @@
   letter-spacing: 0.3px;
 }
 
+.status-badge.aguardando-abertura {
+  background: rgba(31, 41, 55, 0.12);
+  color: var(--bg-dark);
+}
+
 .status-badge.aberto {
   background: rgba(22, 163, 74, 0.12);
   color: var(--success);

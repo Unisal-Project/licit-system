@@ -1,17 +1,18 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import Input  from "../../components/ui/Input/Input"
 import Button from "../../components/ui/Button/Button"
 import Sidebar from "../../components/layout/Sidebar"
-import { Home, Upload, X, FileText } from "lucide-react"
+import {Home, Upload, X, FileText, ArrowLeft} from "lucide-react"
 import "./CreateProcurements.css"
+import {Link} from "react-router-dom";
 
 function PageHeader() {
   return (
     <div className="page-header">
       <div className="page-header-esquerda">
-        <div className="header-icon">
-          <i className="bi bi-layout-text-window-reverse"></i>
-        </div>
+        <Link to="/ProcurementList" className="back-button">
+          <ArrowLeft size={26} />
+        </Link>
         <div>
           <h1>Nova Licitação</h1>
           <p>Preencha os dados para criar uma nova licitação</p>

@@ -1,125 +1,16 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
-import {
-  ArrowLeft,
-  Home,
-  IdCard,
-  Pencil,
-  CalendarDays,
-  FolderOpen,
-  CircleDollarSign,
-  Landmark,
-  Printer,
-} from "lucide-react";
-
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, Home, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Printer } from "lucide-react";
 import Sidebar from "../../components/layout/Sidebar";
-import {
-  Card,
-  InfoField,
-  StatusBadge,
-  Button,
-  AttachmentModal,
-} from "../../components/ui/main";
-
+import { Card, InfoField, StatusBadge, Button, AttachmentModal } from "../../components/ui/main";
+import { getDeadlineInfo, getCurrentProcurementStatus } from "../../components/shared/procurementDeadline";
 import FormatProcurements from "../../components/shared/FormatProcurements";
 import { procurements } from "../../database/procurements";
 import "./DetailsProcurements.css";
 
-const ACTIVE_STATUSES = ["ABERTO", "EM ANDAMENTO"];
-const INACTIVE_STATUSES = ["REVOGADO", "SUSPENSO", "FINALIZADO"];
-
-function parseBrazilianDate(dateString) {
-  if (!dateString) return null;
-
-  const [day, month, year] = dateString.split("/").map(Number);
-
-  if (!day || !month || !year) return null;
-
-  return new Date(year, month - 1, day, 12, 0, 0);
-}
-
-function getTodayAtMidday() {
-  const today = new Date();
-  return new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-    12,
-    0,
-    0
-  );
-}
-
-function calculateDaysUntil(openingDateString) {
-  const openingDate = parseBrazilianDate(openingDateString);
-
-  if (!openingDate) return null;
-
-  const today = getTodayAtMidday();
-  const differenceInMs = openingDate.getTime() - today.getTime();
-
-  return Math.ceil(differenceInMs / (1000 * 60 * 60 * 24));
-}
-
-function getDeadlineInfo(procurement) {
-  const status = procurement.status?.toUpperCase();
-  const daysUntilOpening = calculateDaysUntil(procurement.abertura);
-
-  if (INACTIVE_STATUSES.includes(status)) {
-    return {
-      type: "neutral",
-      label: "Cronograma interrompido",
-      value: "Processo sem prazo ativo",
-      description: `Status atual: ${procurement.status}`,
-    };
-  }
-
-  if (!ACTIVE_STATUSES.includes(status)) {
-    return {
-      type: "neutral",
-      label: "Prazo indisponível",
-      value: "Status não reconhecido",
-      description: `Status atual: ${procurement.status}`,
-    };
-  }
-
-  if (daysUntilOpening === null) {
-    return {
-      type: "neutral",
-      label: "Prazo indisponível",
-      value: "Data inválida",
-      description: "Verifique a data de abertura",
-    };
-  }
-
-  if (daysUntilOpening < 0) {
-    return {
-      type: "negative",
-      label: "Abertura vencida",
-      value: `${Math.abs(daysUntilOpening)} dias atrás`,
-      description: "A data de abertura já passou",
-    };
-  }
-
-  if (daysUntilOpening === 0) {
-    return {
-      type: "positive",
-      label: "Abertura hoje",
-      value: "Hoje",
-      description: "O processo abre hoje",
-    };
-  }
-
-  return {
-    type: "positive",
-    label: "Abertura em",
-    value: `${daysUntilOpening}`,
-    description: daysUntilOpening === 1 ? "dia restante" : "dias restantes",
-  };
-}
-
 function DetailsProcurements() {
   const { id } = useParams();
+  const navigate = useNavigate()
 
   const procurement = procurements.find((item) => item.id === Number(id));
 
@@ -129,6 +20,8 @@ function DetailsProcurements() {
 
   const tituloLicitacao = FormatProcurements(procurement);
   const anexos = procurement.anexos ?? [];
+
+  const currentStatus = getCurrentProcurementStatus(procurement);
   const deadlineInfo = getDeadlineInfo(procurement);
 
   return (
@@ -138,9 +31,9 @@ function DetailsProcurements() {
       <main className="procurement-main">
         <header className="page-header">
           <div className="page-title-group">
-            <Link to="/ProcurementList" className="back-button">
+            <button type="button" className="back-button" onClick={() => navigate(-1)}>
               <ArrowLeft size={26} />
-            </Link>
+            </button>
 
             <div>
               <h1>Detalhes da Licitação</h1>
@@ -164,11 +57,13 @@ function DetailsProcurements() {
 
             <div className="details-actions">
               <AttachmentModal anexos={anexos} />
-
-              <Button variant="secondary" className="btn">
-                <Pencil size={24} />
-                Editar
-              </Button>
+              
+              <Link to={`/procurements/edit/${id}`}>
+                <Button variant="secondary" className="btn">
+                  <Pencil size={24} className="btn-icon" />
+                  Editar
+                </Button>
+              </Link>
 
               <Button variant="primary" className="btn">
                 <Printer size={24} />
@@ -185,7 +80,8 @@ function DetailsProcurements() {
               </div>
 
               <InfoField label="Tipo de Licitação:" value={procurement.tipo} />
-              <StatusBadge status={procurement.status} />
+
+              <StatusBadge status={currentStatus} />
             </Card>
 
             <Card title="Descrição" icon={Pencil} className="span-5">
@@ -259,6 +155,10 @@ function DetailsProcurements() {
                   <strong className="countdown-days">
                     {deadlineInfo.value}
                   </strong>
+
+                  <span className="countdown-text">
+                    {deadlineInfo.description}
+                  </span>
                 </div>
               </div>
             </Card>

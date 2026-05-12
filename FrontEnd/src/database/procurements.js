@@ -5,9 +5,9 @@ export const procurements = [
     ano: "2026",
     tipo: "Pregao Eletronico",
     origem: "SEAD",
-    publicacao: "01/01/2026",
+    publicacao: "11/05/2026",
     abertura: "16/05/2026",
-    status: "Aberto",
+    status: "Aguardando Abertura",
 
     objeto:
       "Aquisição de equipamentos de informática para modernização administrativa.",
@@ -38,8 +38,8 @@ export const procurements = [
     ano: "2026",
     tipo: "Concorrencia Publica",
     origem: "SEOS",
-    publicacao: "01/04/2026",
-    abertura: "11/04/2026",
+    publicacao: "12/05/2026",
+    abertura: "20/05/2026",
     status: "Em Andamento",
 
     objeto:
@@ -49,7 +49,7 @@ export const procurements = [
     classificacao: "Infraestrutura",
     valorEstimado: "R$ 2.500.000,00",
     secretaria: "Secretaria de Obras",
-    criadoEm: "07/01/2026 às 10:00",
+    criadoEm: "12/05/2026 às 10:00",
 
     anexos: [
       {
@@ -71,8 +71,8 @@ export const procurements = [
     ano: "2026",
     tipo: "Pregao Eletronico",
     origem: "SEMUS",
-    publicacao: "01/04/2026",
-    abertura: "11/04/2026",
+    publicacao: "13/05/2026",
+    abertura: "25/05/2026",
     status: "Suspenso",
 
     objeto:
@@ -82,7 +82,7 @@ export const procurements = [
     classificacao: "Saúde",
     valorEstimado: "R$ 980.000,00",
     secretaria: "Secretaria Municipal de Saúde",
-    criadoEm: "08/01/2026 às 09:15",
+    criadoEm: "13/05/2026 às 09:15",
 
     anexos: [
       {
@@ -99,9 +99,9 @@ export const procurements = [
     ano: "2026",
     tipo: "Pregao Eletronico",
     origem: "SEMUS",
-    publicacao: "01/04/2026",
-    abertura: "11/04/2026",
-    status: "Revogado",
+    publicacao: "14/05/2026",
+    abertura: "28/05/2026",
+    status: "Aberto",
 
     objeto:
       "Contratação de serviço de manutenção hospitalar.",
@@ -110,7 +110,7 @@ export const procurements = [
     classificacao: "Saúde",
     valorEstimado: "R$ 450.000,00",
     secretaria: "Secretaria Municipal de Saúde",
-    criadoEm: "08/01/2026 às 11:40",
+    criadoEm: "14/05/2026 às 11:40",
 
     anexos: [
       {
@@ -127,8 +127,8 @@ export const procurements = [
     ano: "2026",
     tipo: "Concorrencia Publica",
     origem: "SEDU",
-    publicacao: "01/04/2026",
-    abertura: "11/04/2026",
+    publicacao: "15/05/2026",
+    abertura: "30/05/2026",
     status: "Finalizado",
 
     objeto:
@@ -138,7 +138,7 @@ export const procurements = [
     classificacao: "Educação",
     valorEstimado: "R$ 1.800.000,00",
     secretaria: "Secretaria de Educação",
-    criadoEm: "09/01/2026 às 08:20",
+    criadoEm: "15/05/2026 às 08:20",
 
     anexos: [
       {
@@ -160,9 +160,9 @@ export const procurements = [
     ano: "2026",
     tipo: "Pregao Eletronico",
     origem: "SEAS",
-    publicacao: "01/04/2026",
-    abertura: "11/04/2026",
-    status: "Finalizado",
+    publicacao: "16/05/2026",
+    abertura: "05/06/2026",
+    status: "Aguardando Abertura",
 
     objeto:
       "Aquisição de cestas básicas para assistência social.",
@@ -171,7 +171,7 @@ export const procurements = [
     classificacao: "Assistência Social",
     valorEstimado: "R$ 620.000,00",
     secretaria: "Secretaria de Assistência Social",
-    criadoEm: "10/01/2026 às 15:10",
+    criadoEm: "16/05/2026 às 15:10",
 
     anexos: [
       {
@@ -188,8 +188,8 @@ export const procurements = [
     ano: "2026",
     tipo: "Concorrencia Publica",
     origem: "SEAS",
-    publicacao: "01/04/2026",
-    abertura: "11/04/2026",
+    publicacao: "17/05/2026",
+    abertura: "10/06/2026",
     status: "Revogado",
 
     objeto:
@@ -199,7 +199,7 @@ export const procurements = [
     classificacao: "Infraestrutura",
     valorEstimado: "R$ 870.000,00",
     secretaria: "Secretaria de Assistência Social",
-    criadoEm: "11/01/2026 às 13:45",
+    criadoEm: "17/05/2026 às 13:45",
 
     anexos: [
       {
@@ -211,6 +211,43 @@ export const procurements = [
         nome: "planilha_custos.xlsx",
         tamanho: "410 KB",
         tipo: "xlsx",
+      },
+    ],
+  },
+  {
+    id: 8,
+    numero: "028",
+    ano: "2026",
+    tipo: "Pregão Eletrônico",
+    origem: "SEDUC",
+    publicacao: "21/05/2026",
+    abertura: "15/06/2026",
+    status: "Em Andamento",
+
+    objeto:
+        "Aquisição de equipamentos de informática para modernização das escolas municipais.",
+    descricao:
+        "Compra de computadores, notebooks, projetores e equipamentos de rede para unidades escolares da rede pública municipal.",
+    classificacao: "Tecnologia",
+    valorEstimado: "R$ 1.250.000,00",
+    secretaria: "Secretaria Municipal de Educação",
+    criadoEm: "21/05/2026 às 09:20",
+
+    anexos: [
+      {
+        nome: "termo_referencia.pdf",
+        tamanho: "3.1 MB",
+        tipo: "pdf",
+      },
+      {
+        nome: "itens_e_quantidades.xlsx",
+        tamanho: "520 KB",
+        tipo: "xlsx",
+      },
+      {
+        nome: "edital_pregao.docx",
+        tamanho: "1.8 MB",
+        tipo: "docx",
       },
     ],
   },
