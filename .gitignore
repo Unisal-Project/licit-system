@@ -1,0 +1,70 @@
+# ========================
+# IDEs e Editores
+# ========================
+.idea/
+.vscode/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ========================
+# Python (Geral e BackEnd/)
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.toast
+.build
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# ========================
+# Variáveis de Ambiente e Segredos
+# ========================
+.env
+.env.*
+# Removida a exceção do .env.example conforme pedido
+
+# ========================
+# Uploads e Arquivos de Usuário (IMPORTANTE)
+# ========================
+uploads/
+BackEnd/uploads/
+
+# ========================
+# Build / Compilados
+# ========================
+dist/
+build/
+out/
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ========================
+# Sistema Operacional
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log

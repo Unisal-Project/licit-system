@@ -1,0 +1,63 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: licitsystem_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: licit_system
+      MYSQL_USER: user
+      MYSQL_PASSWORD: licitpass123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./BackEnd/init-db:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-plicitpass123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  api:
+    build:
+      context: ./BackEnd
+      dockerfile: Dockerfile
+    container_name: licitsystem_api
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: user
+      DB_PASSWORD: licitpass123
+      DB_NAME: licit_system
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./BackEnd:/app
+      - ./uploads:/app/uploads
+    command: >
+      sh -c "pip install -r requirements &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build:
+      context: ./FrontEnd
+    container_name: licitsystem_frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./FrontEnd:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data:
