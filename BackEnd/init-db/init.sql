@@ -9,19 +9,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- ------------------------------------------------------------
 -- Criação do banco de dados
--- ------------------------------------------------------------
 CREATE DATABASE IF NOT EXISTS `licit_system`
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_0900_ai_ci;
 
 USE `licit_system`;
 
--- ============================================================
+
 -- Tabela: usuarios
 -- (sem dependências externas — criada primeiro)
--- ============================================================
 DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `id`           int          NOT NULL AUTO_INCREMENT,
@@ -37,10 +34,8 @@ CREATE TABLE `usuarios` (
   UNIQUE KEY `uq_usuario_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ============================================================
 -- Tabela: secretarias
 -- (sem dependências externas)
--- ============================================================
 DROP TABLE IF EXISTS `secretarias`;
 CREATE TABLE `secretarias` (
   `id`    int          NOT NULL AUTO_INCREMENT,
@@ -51,30 +46,29 @@ CREATE TABLE `secretarias` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `secretarias` (`sigla`, `nome`) VALUES
-  ('SEAD',   'Secretaria Municipal de Administração'),
+  ('SEAD',   'Secretaria Municipal de Administracao'),
   ('GAB',    'Gabinete'),
   ('SEGOV',  'Secretaria Municipal de Governo'),
-  ('SMADS',  'Secretaria Municipal de Assistência e Desenvolvimento Social'),
+  ('SMADS',  'Secretaria Municipal de Assistencia e Desenvolvimento Social'),
   ('SECULT', 'Secretaria Municipal de Cultura'),
-  ('SMDET',  'Secretaria Municipal de Desenvolvimento Econômico e Turismo'),
-  ('SAJ',    'Secretaria Municipal de Assuntos Jurídicos'),
+  ('SMDET',  'Secretaria Municipal de Desenvolvimento Economico e Turismo'),
+  ('SAJ',    'Secretaria Municipal de Assuntos Juridicos'),
   ('SMDUR',  'Secretaria Municipal de Desenvolvimento Urbano e Rural'),
-  ('SEDU',   'Secretaria Municipal de Educação'),
+  ('SEDU',   'Secretaria Municipal de Educacao'),
   ('SEMELJ', 'Secretaria Municipal de Esporte, Lazer e Juventude'),
-  ('SEFIN',  'Secretaria Municipal de Finanças'),
+  ('SEFIN',  'Secretaria Municipal de Financas'),
   ('SEMMA',  'Secretaria Municipal de Meio Ambiente'),
-  ('SMOSP',  'Secretaria Municipal de Obras e Serviços Públicos'),
-  ('SEMUS',  'Secretaria Municipal de Saúde'),
-  ('SMSP',   'Secretaria Municipal de Segurança Pública'),
-  ('SMPD',   'Secretaria Municipal da Pessoa com Deficiência'),
-  ('SMPP',   'Secretaria Municipal de Políticas Públicas'),
+  ('SMOSP',  'Secretaria Municipal de Obras e Servicos Publicos'),
+  ('SEMUS',  'Secretaria Municipal de Saude'),
+  ('SMSP',   'Secretaria Municipal de Seguranca Publica'),
+  ('SMPD',   'Secretaria Municipal da Pessoa com Deficiencia'),
+  ('SMPP',   'Secretaria Municipal de Politicas Publicas'),
   ('SMDH',   'Secretaria Municipal da Mulher e de Direitos Humanos'),
   ('SEFAZ',  'Secretaria Municipal da Fazenda');
 
--- ============================================================
+
 -- Tabela: categorias
 -- (sem dependências externas)
--- ============================================================
 DROP TABLE IF EXISTS `categorias`;
 CREATE TABLE `categorias` (
   `id`   int         NOT NULL AUTO_INCREMENT,
@@ -83,10 +77,9 @@ CREATE TABLE `categorias` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ============================================================
+
 -- Tabela: licitacoes
 -- (depende de: usuarios, secretarias, categorias)
--- ============================================================
 DROP TABLE IF EXISTS `licitacoes`;
 CREATE TABLE `licitacoes` (
   `id`               int            NOT NULL AUTO_INCREMENT,
@@ -115,10 +108,9 @@ CREATE TABLE `licitacoes` (
   CONSTRAINT `licitacoes_ibfk_3` FOREIGN KEY (`categoria_id`)  REFERENCES `categorias`  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ============================================================
+
 -- Tabela: licitacao_logs
 -- (depende de: licitacoes, usuarios)
--- ============================================================
 DROP TABLE IF EXISTS `licitacao_logs`;
 CREATE TABLE `licitacao_logs` (
   `id`           int         NOT NULL AUTO_INCREMENT,
@@ -134,10 +126,9 @@ CREATE TABLE `licitacao_logs` (
   CONSTRAINT `licitacao_logs_ibfk_2` FOREIGN KEY (`usuario_id`)   REFERENCES `usuarios`   (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ============================================================
+
 -- Tabela: anexos
 -- (depende de: licitacoes)
--- ============================================================
 DROP TABLE IF EXISTS `anexos`;
 CREATE TABLE `anexos` (
   `id`           int          NOT NULL AUTO_INCREMENT,
@@ -153,10 +144,9 @@ CREATE TABLE `anexos` (
   CONSTRAINT `anexos_ibfk_1` FOREIGN KEY (`licitacao_id`) REFERENCES `licitacoes` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ============================================================
+
 -- Tabela: convites
 -- (depende de: usuarios)
--- ============================================================
 DROP TABLE IF EXISTS `convites`;
 CREATE TABLE `convites` (
   `id`             int          NOT NULL AUTO_INCREMENT,
@@ -175,7 +165,7 @@ CREATE TABLE `convites` (
   CONSTRAINT `convites_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- ============================================================
+
 -- Restauração das configurações originais
 -- ============================================================
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
