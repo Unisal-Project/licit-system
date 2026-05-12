@@ -53,5 +53,5 @@ export function getStatusColor(status) {
         "FINALIZADO": "var(--bg-dark)",
     };
 
-    return colors[status] || "var(--bg-dark)";
+    return colors[normalizedStatus] || "var(--bg-dark)";
 }

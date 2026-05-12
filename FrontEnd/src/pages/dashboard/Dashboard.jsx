@@ -6,7 +6,6 @@ import CardStats from "../../components/ui/DashboardComponents/CardStats"
 import ProcurementTable from "../../components/ui/DashboardComponents/ProcurementTable"
 import ChartCard from "../../components/ui/DashboardComponents/ChartCard"
 import FooterBar from "../../components/ui/DashboardComponents/FooterBar"
-import DonutCard from "../../components/ui/DashboardComponents/DonutCard";
 import InfoCard from "../../components/ui/DashboardComponents/InfoCard";
 import { FolderOpen, ClockAlert } from "lucide-react"
 import "./Dashboard.css"

@@ -25,8 +25,6 @@ function AppRoutes() {
                 <Route path="/procurements/edit/:id" element={<EditProcurements />} />
                 <Route path="/procurements/:id" element={<DetailsProcurements />} />
 
-                <Route path="/CreateProcurements"element={<Navigate to="/procurements/create" replace />}/>
-
                 <Route path="/remote-access" element={<RemoteAccess />} />
 
                 <Route path="*" element={<Navigate to="/procurements" replace />} />
