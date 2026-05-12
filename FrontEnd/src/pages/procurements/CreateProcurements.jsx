@@ -66,7 +66,7 @@ function CardIdentificacao({ dados, onChange }) {
                 value={dados.tipo}
                 onChange={(e) => onChange('tipo', e.target.value)}
               >
-                <option value=""disabled>Selecione</option>
+                <option>Selecione</option>
                 <option>Pregão Eletrônico</option>
                 <option>Concorrência</option>
                 <option>Tomada de Preços</option>
@@ -81,7 +81,7 @@ function CardIdentificacao({ dados, onChange }) {
                 value={dados.status}
                 onChange={(e) => onChange('status', e.target.value)}
               >
-                <option value=""disabled>Selecione</option>
+                <option>Selecione</option>
                 <option>Aberto</option>
                 <option>Fechado</option>
                 <option>Cancelado</option>
