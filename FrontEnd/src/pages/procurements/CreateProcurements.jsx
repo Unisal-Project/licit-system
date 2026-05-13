@@ -1,21 +1,20 @@
-import React, { useState } from "react"
-import Input  from "../../components/ui/Input/Input"
+import { useState } from "react"
+import Input from "../../components/ui/Input/Input"
 import Button from "../../components/ui/Button/Button"
 import Sidebar from "../../components/layout/Sidebar"
-import {Home, Upload, X, FileText, ArrowLeft} from "lucide-react"
+import { Home, ArrowLeft, Upload, X, FileText, Edit, Printer, Paperclip } from "lucide-react"
 import "./CreateProcurements.css"
-import {Link} from "react-router-dom";
 
 function PageHeader() {
   return (
     <div className="page-header">
       <div className="page-header-esquerda">
-        <Link to="/ProcurementList" className="back-button">
-          <ArrowLeft size={26} />
-        </Link>
+        <button className="btn-back">
+          <ArrowLeft size={18} />
+        </button>
         <div>
-          <h1>Nova Licitação</h1>
-          <p>Preencha os dados para criar uma nova licitação</p>
+          <h1>Detalhes da Licitação</h1>
+          <p>Visualize informações da licitação</p>
         </div>
       </div>
       <div className="breadcrumb">
@@ -29,279 +28,246 @@ function PageHeader() {
   )
 }
 
-function CardIdentificacao({ dados, onChange }) {
-  return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-person-badge"></i>
-        <div>
-          <h3>Identificação</h3>
-          <p>Informe os dados básicos da licitação</p>
-        </div>
-      </div>
-      <div className="card-body">
-        <div className="campo-linha">
-          <div className="campo">
-            <label>Numero:</label>
-            <Input
-              placeholder="Ex.: 123"
-              value={dados.numero}
-              onChange={(e) => onChange('numero', e.target.value)}
-            />
-          </div>
-          <div className="campo campo-pequeno">
-            <label>Ano:</label>
-            <Input
-              placeholder="2026"
-              value={dados.ano}
-              onChange={(e) => onChange('ano', e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="campo-linha">
-          <div className="campo">
-            <label>Tipo de Licitação:</label>
-            <div className="select-wrapper">
-              <select
-                value={dados.tipo}
-                onChange={(e) => onChange('tipo', e.target.value)}
-              >
-                <option>Selecione</option>
-                <option>Pregão Eletrônico</option>
-                <option>Concorrência</option>
-                <option>Tomada de Preços</option>
-                <option>Convite</option>
-              </select>
-            </div>
-          </div>
-          <div className="campo">
-            <label>Status:</label>
-            <div className="select-wrapper">
-              <select
-                value={dados.status}
-                onChange={(e) => onChange('status', e.target.value)}
-              >
-                <option>Selecione</option>
-                <option>Aberto</option>
-                <option>Fechado</option>
-                <option>Cancelado</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+function SubHeader({ dados, onAnexo, onSalvar }) {
+  const titulo = dados.tipo && dados.numero && dados.ano
+    ? `${dados.tipo} nº ${dados.numero}/${dados.ano}`
+    : "Nova Licitação"
 
-function CardDescricao({ dados, onChange }) {
-  return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-pencil"></i>
-        <div>
-          <h3>Descrição</h3>
-          <p>Descreva o objeto da licitação</p>
-        </div>
-      </div>
-      <div className="card-body">
-        <div className="campo">
-          <label>Objeto:</label>
-          <Input
-            placeholder="Digite o objeto da licitação"
-            value={dados.objeto}
-            onChange={(e) => onChange('objeto', e.target.value)}
-          />
-        </div>
-        <div className="campo">
-          <label>Descrição do Objeto:</label>
-          <textarea
-            className="textarea"
-            placeholder="Detalhe o objeto, especificações e informações complementares..."
-            value={dados.descricao}
-            onChange={(e) => onChange('descricao', e.target.value)}
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
+  const agora = new Date()
+  const criacao = agora.toLocaleDateString("pt-BR") + " às " +
+    agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
 
-function CardClassificacao({ dados, onChange }) {
   return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-folder"></i>
-        <div>
-          <h3>Classificação</h3>
-          <p>Defina a Classificação</p>
-        </div>
+    <div className="subheader">
+      <div className="subheader-esquerda">
+        <h2>{titulo}</h2>
+        <span className="subheader-criacao">Criada em {criacao}</span>
       </div>
-      <div className="card-body">
-        <div className="campo">
-          <label>Classificação:</label>
-          <div className="select-wrapper">
-            <select
-              value={dados.classificacao}
-              onChange={(e) => onChange('classificacao', e.target.value)}
-            >
-             <option value="" disabled>Defina a Classificação</option>
-              <option>Global</option>
-              <option>Por Item</option>
-              <option>Por Lote</option>
-            </select>
-          </div>
-        </div>
-        <Button variant="segundary">
-          <Upload size={16}/>
-          Panilha Excel (.xlsx)
+      <div className="subheader-acoes">
+        <button className="btn-anexo" onClick={onAnexo} title="Anexos">
+          <Paperclip size={20} />
+        </button>
+        <Button variant="segundary" onClick={() => {}}>
+          <Edit size={15} />
+          Editar
+        </Button>
+        <Button variant="primary" onClick={onSalvar}>
+          <Printer size={15} />
+          Imprimir
         </Button>
       </div>
     </div>
   )
 }
 
-function CardFinanceiro({ dados, onChange }) {
+function Card({ icon, titulo, children }) {
   return (
     <div className="card">
       <div className="card-titulo">
-        <i className="bi bi-currency-dollar"></i>
-        <div>
-          <h3>Financeiro</h3>
-          <p>Informe o valor estimado</p>
-        </div>
+        <i className={`bi ${icon}`}></i>
+        <h3>{titulo}</h3>
       </div>
       <div className="card-body">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function CardIdentificacao({ dados, onChange }) {
+  return (
+    <Card icon="bi-person-badge" titulo="Identificação">
+      <div className="campo-linha">
         <div className="campo">
-          <label>Valor Estimado:</label>
+          <label>Número:</label>
           <Input
-            placeholder="R$ 00,00"
-            value={dados.valorEstimado}
-            onChange={(e) => onChange('valorEstimado', e.target.value)}
+            placeholder="Ex.: 021"
+            value={dados.numero}
+            onChange={(e) => onChange("numero", e.target.value)}
+          />
+        </div>
+        <div className="campo campo-pequeno">
+          <label>Ano:</label>
+          <Input
+            placeholder="2026"
+            value={dados.ano}
+            onChange={(e) => onChange("ano", e.target.value)}
           />
         </div>
       </div>
-    </div>
+      <div className="campo">
+        <label>Tipo de Licitação:</label>
+        <div className="select-wrapper">
+          <select value={dados.tipo} onChange={(e) => onChange("tipo", e.target.value)}>
+            <option value="" disabled>Selecione</option>
+            <option>Pregao Eletronico</option>
+            <option>Concorrência</option>
+            <option>Tomada de Preços</option>
+            <option>Convite</option>
+          </select>
+        </div>
+      </div>
+      <div className="campo">
+        <label>Status:</label>
+        <div className="status-display">
+          <span className="status-texto">
+            {dados.status || ""}
+          </span>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+function CardDescricao({ dados, onChange }) {
+  return (
+    <Card icon="bi-pencil" titulo="Descrição">
+      <div className="campo">
+        <label>Objeto:</label>
+        <Input
+          placeholder="Aquisição de equipamentos de informática..."
+          value={dados.objeto}
+          onChange={(e) => onChange("objeto", e.target.value)}
+        />
+      </div>
+      <div className="campo">
+        <label>Descrição do Objeto:</label>
+        <textarea
+          className="textarea"
+          placeholder="Aquisição de computadores, notebooks e impressoras para atender às demandas..."
+          value={dados.descricao}
+          onChange={(e) => onChange("descricao", e.target.value)}
+        />
+      </div>
+    </Card>
   )
 }
 
 function CardDatas({ dados, onChange }) {
   return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-calendar"></i>
-        <div>
-          <h3>Datas</h3>
-          <p>Defina as datas importantes</p>
+    <Card icon="bi-calendar" titulo="Datas">
+      <div className="campo">
+        <label>Data de Publicação:</label>
+        <input
+          className="input-date"
+          type="date"
+          value={dados.dataPublicacao}
+          onChange={(e) => onChange("dataPublicacao", e.target.value)}
+        />
+      </div>
+      <div className="campo">
+        <label>Data de Abertura:</label>
+        <input
+          className="input-date"
+          type="date"
+          value={dados.dataAbertura}
+          onChange={(e) => onChange("dataAbertura", e.target.value)}
+        />
+      </div>
+    </Card>
+  )
+}
+
+function CardClassificacao({ dados, onChange }) {
+  return (
+    <Card icon="bi-folder" titulo="Classificação">
+      <div className="campo">
+        <label>Classificação:</label>
+        <div className="select-wrapper">
+          <select value={dados.classificacao} onChange={(e) => onChange("classificacao", e.target.value)}>
+            <option value="" disabled>Selecione</option>
+            <option>Tecnologia</option>
+            <option>Global</option>
+            <option>Por Item</option>
+            <option>Por Lote</option>
+          </select>
         </div>
       </div>
-      <div className="card-body">
-        <div className="campo">
-          <label>Data de Publicação:</label>
-          <input
-            className="input-date"
-            type="date"
-            value={dados.dataPublicacao}
-            onChange={(e) => onChange('dataPublicacao', e.target.value)}
-          />
-        </div>
-        <div className="campo">
-          <label>Data de Abertura:</label>
-          <input
-            className="input-date"
-            type="date"
-            value={dados.dataAbertura}
-            onChange={(e) => onChange('dataAbertura', e.target.value)}
-          />
-        </div>
+    </Card>
+  )
+}
+
+function CardFinanceiro({ dados, onChange }) {
+  return (
+    <Card icon="bi-currency-dollar" titulo="Financeiro">
+      <div className="campo">
+        <label>Valor Estimado:</label>
+        <Input
+          placeholder="R$ 00,00"
+          value={dados.valorEstimado}
+          onChange={(e) => onChange("valorEstimado", e.target.value)}
+        />
       </div>
-    </div>
+    </Card>
   )
 }
 
 function CardOrigem({ dados, onChange }) {
   return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-bank"></i>
-        <div>
-          <h3>Origem</h3>
-          <p>Selecione a secretaria responsável</p>
+    <Card icon="bi-bank" titulo="Origem">
+      <div className="campo">
+        <label>Secretaria Responsável:</label>
+        <div className="select-wrapper">
+          <i className="bi bi-search select-search-icon"></i>
+          <select value={dados.secretaria} onChange={(e) => onChange("secretaria", e.target.value)}>
+            <option value="" disabled>Procurar Secretaria</option>
+            <option>Secretaria de Administração</option>
+            <option>SEGOV</option>
+            <option>SEFAZ</option>
+            <option>SEAD</option>
+            <option>SEFI</option>
+            <option>SEMEC</option>
+            <option>SEMUS</option>
+            <option>SEESP</option>
+            <option>SMSP</option>
+            <option>SEAS</option>
+            <option>SEPCD</option>
+            <option>SEMDH</option>
+            <option>SEC</option>
+            <option>SEPP</option>
+            <option>SEOS</option>
+            <option>SEMA</option>
+            <option>SEDU</option>
+            <option>SEDET</option>
+            <option>SEAJ</option>
+          </select>
         </div>
       </div>
-      <div className="card-body">
-        <div className="campo">
-          <div className="select-wrapper">
-            <i className="bi bi-search select-search-icon"></i>
-           <select
-  value={dados.secretaria}
-  onChange={(e) => onChange('secretaria', e.target.value)}
->
-  <option value="" disabled>Procurar Secretaria</option>
-  <option>SEGOV</option>
-  <option>SEFAZ</option>
-  <option>SEAD</option>
-  <option>SEFI</option>
-  <option>SEMEC</option>
-  <option>SEMUS</option>
-  <option>SEESP</option>
-  <option>SMSP</option>
-  <option>SEAS</option>
-  <option>SEPCD</option>
-  <option>SEMDH</option>
-  <option>SEC</option>
-  <option>SEPP</option>
-  <option>SEOS</option>
-  <option>SEMA</option>
-  <option>SEDU</option>
-  <option>SEDET</option>
-  <option>SEAJ</option>
-</select>
-          </div>
-        </div>
-      </div>
-    </div>
+    </Card>
   )
 }
 
 function CardAnexos({ anexos, onAdd, onRemove }) {
   return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-paperclip"></i>
-        <div>
-          <h3>Anexos</h3>
-          <p>Faça upload dos arquivos relacionados</p>
-        </div>
-      </div>
-      <div className="card-body card-anexos">
+    <Card icon="bi-paperclip" titulo="Anexos">
+      <div className="card-anexos">
         <label className="upload-area">
-          <Upload size={32} className="upload-icon"/>
-          <p>Arraste os arquivos aqui ou <span className="upload-link">clique para selecionar</span></p>
-          <p className="upload-info">PDF, DOCX, XLSX </p>
-          <input type="file" multiple hidden onChange={onAdd}/>
+          <Upload size={28} className="upload-icon" />
+          <p>Arraste ou <span className="upload-link">clique para selecionar</span></p>
+          <p className="upload-info">PDF, DOCX, XLSX</p>
+          <input type="file" multiple hidden onChange={onAdd} />
         </label>
         {anexos.length > 0 && (
           <div className="anexos-lista">
-            <p className="anexos-titulo">Arquivos adicionados ({anexos.length})</p>
+            <p className="anexos-titulo">Arquivos ({anexos.length})</p>
             {anexos.map((anexo, index) => (
               <div className="anexo-item" key={index}>
                 <div className="anexo-info">
-                  <FileText size={16}/>
+                  <FileText size={15} />
                   <div>
                     <p>{anexo.name}</p>
                     <span>{(anexo.size / 1024).toFixed(0)} KB</span>
                   </div>
                 </div>
                 <button className="btn-remover" onClick={() => onRemove(index)}>
-                  <X size={16}/>
+                  <X size={15} />
                 </button>
               </div>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </Card>
   )
 }
 
@@ -320,18 +286,19 @@ function CreateProcurements() {
     secretaria: "",
   })
   const [anexos, setAnexos] = useState([])
+  const [mostrarAnexos, setMostrarAnexos] = useState(false)
 
   const handleChange = (campo, valor) => {
-    setDados(prev => ({ ...prev, [campo]: valor }))
+    setDados((prev) => ({ ...prev, [campo]: valor }))
   }
 
   const handleAddAnexo = (e) => {
     const files = Array.from(e.target.files)
-    setAnexos(prev => [...prev, ...files])
+    setAnexos((prev) => [...prev, ...files])
   }
 
   const handleRemoveAnexo = (index) => {
-    setAnexos(prev => prev.filter((_, i) => i !== index))
+    setAnexos((prev) => prev.filter((_, i) => i !== index))
   }
 
   const handleSalvar = () => {
@@ -339,43 +306,38 @@ function CreateProcurements() {
     console.log("Anexos:", anexos)
   }
 
-
-   return (
+  return (
     <div className="wrapper">
       <Sidebar />
       <main className="main">
         <PageHeader />
-        <div className="cards-grid">
-            
-          <div className="cards-linha">
+
+        <div className="conteudo-box">
+          <SubHeader
+            dados={dados}
+            onAnexo={() => setMostrarAnexos((v) => !v)}
+            onSalvar={handleSalvar}
+          />
+          
+          <div className="grid-linha-1">
             <CardIdentificacao dados={dados} onChange={handleChange} />
             <CardDescricao dados={dados} onChange={handleChange} />
-          </div>
-
-          <div className="cards-linha">
-            <CardClassificacao dados={dados} onChange={handleChange} />
-            <CardFinanceiro dados={dados} onChange={handleChange} />
             <CardDatas dados={dados} onChange={handleChange} />
           </div>
 
-          <div className="cards-linha">
+          <div className="grid-linha-2">
+            <CardClassificacao dados={dados} onChange={handleChange} />
+            <CardFinanceiro dados={dados} onChange={handleChange} />
             <CardOrigem dados={dados} onChange={handleChange} />
+          </div>
+
+          {mostrarAnexos && (
             <CardAnexos
               anexos={anexos}
               onAdd={handleAddAnexo}
               onRemove={handleRemoveAnexo}
             />
-          </div>
-
-        </div>
-        <div className="rodape">
-          <Button variant="primary" onClick={handleSalvar}>
-            <i className="bi bi-floppy"></i>
-            Salvar
-          </Button>
-          <Button variant="segundary">
-            Cancelar
-          </Button>
+          )}
         </div>
       </main>
     </div>
