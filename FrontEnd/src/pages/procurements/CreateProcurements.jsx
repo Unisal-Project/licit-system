@@ -211,25 +211,25 @@ function CardOrigem({ dados, onChange }) {
           <i className="bi bi-search select-search-icon"></i>
           <select value={dados.secretaria} onChange={(e) => onChange("secretaria", e.target.value)}>
             <option value="" disabled>Procurar Secretaria</option>
-            <option>Secretaria de Administração</option>
-            <option>SEGOV</option>
-            <option>SEFAZ</option>
-            <option>SEAD</option>
-            <option>SEFI</option>
-            <option>SEMEC</option>
-            <option>SEMUS</option>
-            <option>SEESP</option>
-            <option>SMSP</option>
-            <option>SEAS</option>
-            <option>SEPCD</option>
-            <option>SEMDH</option>
-            <option>SEC</option>
-            <option>SEPP</option>
-            <option>SEOS</option>
-            <option>SEMA</option>
-            <option>SEDU</option>
-            <option>SEDET</option>
-            <option>SEAJ</option>
+            <option>Secretaria Municipal de Administração</option>
+            <option>Gabinete</option>
+            <option>Secretaria Municipal de Governo</option>
+            <option>Secretaria Municipal de Assistência e Desenvolvimento Social</option>
+            <option>Secretaria Municipal de Cultura</option>
+            <option>Secretaria Municipal de Desenvolvimento Econômico e Turismo</option>
+            <option>Secretaria Municipal de Assuntos Jurídicos</option>
+            <option>Secretaria Municipal de Desenvolvimento Urbano e Rural</option>
+            <option>Secretaria Municipal de Educação</option>
+            <option>Secretaria Municipal de Esporte, Lazer e Juventude</option>
+            <option>Secretaria Municipal de Finanças</option>
+            <option>Secretaria  Municipal de Meio Ambiente</option>
+            <option>Secretaria Municipal de Obras e Serviços Públicos</option>
+            <option>Secretaria Municipal de Saúde</option>
+            <option>Secretaria Municipal de Segurança Pública</option>
+            <option>Secretaria Municipal da Pessoa com Deficiência</option>
+            <option>Secretaria Municipal de Políticas Públicas</option>
+            <option>Secretaria Municipal da Mulher e de Direitos Humanos</option>
+            <option>Secretaria Municipal da Fazenda</option>
           </select>
         </div>
       </div>
