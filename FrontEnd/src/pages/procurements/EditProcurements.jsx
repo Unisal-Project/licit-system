@@ -1,20 +1,14 @@
-<<<<<<< HEAD
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { ArrowLeft, Home, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Paperclip, Save, FileText, Upload, X, Trash2 } from "lucide-react";
+import { ArrowLeft, Home, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Save, X, Trash2 } from "lucide-react";
 import Sidebar from "../../components/layout/Sidebar";
 import { Card, Button, EditAttachmentsModal } from "../../components/ui/main";
-import FormatProcurements from "../../components/shared/FormatProcurements";
 import { getProcurementById, updateProcurement, deleteProcurement } from "../../services/procurementService";
 import { customSelectStyles } from "../../components/shared/styleSelect";
 import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
 import "./DetailsProcurements.css";
-=======
-import React, { useState } from "react";
-import { ArrowLeft, Home, Pencil, IdCard, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Paperclip, Trash2, Save, X } from "lucide-react";
->>>>>>> 7e199fd45db4007b1cfcd3f47b3374dde7c6fd18
 import "./EditProcurements.css";
 
 const INITIAL_FORM_DATA = {
@@ -33,7 +27,6 @@ const INITIAL_FORM_DATA = {
   criadoEm: "",
 };
 
-<<<<<<< HEAD
 const formatDateToBrazilian = (date) => {
   if (!date) return "";
 
@@ -45,18 +38,11 @@ const formatDateToInput = (date) => {
   if (!date) return "";
 
   if (date.includes("-")) return date;
-=======
-const tiposLicitacao = ["Pregão Eletrônico", "Concorrência", "Tomada de Preços"];
-const statusLicitacao = ["Aberto", "Em Andamento", "Suspenso", "Revogado", "Finalizado"];
-const classificacoes = ["Global", "Por Item", "Por Lote"];
-const secretarias = ["Secretaria Municipal de Administração", "Gabinete", "Secretaria Municipal de Governo", "Secretaria Municipal de Assistência e Desenvolvimento Social", "Secretaria Municipal de Cultura", "Secretaria Municipal de Desenvolvimento Econômico e Turismo", "Secretaria Municipal de Assuntos Jurídicos", "Secretaria Municipal de Desenvolvimento Urbano e Rural", "Secretaria Municipal de Educação", "Secretaria Municipal de Esporte, Lazer e Juventude", "Secretaria Municipal de Finanças", "Secretaria Municipal de Meio Ambiente", "Secretaria Municipal de Obras e Serviços Públicos", "Secretaria Municipal de Saúde", "Secretaria Municipal de Segurança Pública", "Secretaria Municipal da Pessoa com Deficiência", "Secretaria Municipal de Políticas Públicas", "Secretaria Municipal da Mulher e de Direitos Humanos", "Secretaria Municipal da Fazenda"];
->>>>>>> 7e199fd45db4007b1cfcd3f47b3374dde7c6fd18
 
   const [day, month, year] = date.split("/");
   return `${year}-${month}-${day}`;
 };
 
-<<<<<<< HEAD
 const getSelectedSecretaria = (value) => {
   return SECRETARIAS.find(
     (secretaria) => secretaria.value === value || secretaria.label === value
@@ -124,11 +110,6 @@ function SelectField({
 
   const selectedOption =
     finalOptions.find((option) => option.value === value) || null;
-=======
-  function handleChange(campo, valor) {
-    setLicitacao((prev) => ({ ...prev, [campo]: valor }));
-  }
->>>>>>> 7e199fd45db4007b1cfcd3f47b3374dde7c6fd18
 
   return (
     <label className="edit-field">
@@ -171,87 +152,6 @@ function SecretariaSelect({ value, onChange }) {
         menuPosition="fixed"
       />
     </label>
-  );
-}
-
-function AttachmentItem({ attachment, onRemove }) {
-  const fileName = attachment.name || attachment.nome;
-
-  const fileSize =
-    attachment.tamanho ||
-    `${Math.max(1, Math.round((attachment.size || 0) / 1024))} KB`;
-
-  return (
-    <div className="edit-attachment-item">
-      <div className="edit-attachment-info">
-        <FileText size={18} />
-
-        <div>
-          <p>{fileName}</p>
-          <span>{fileSize}</span>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        className="edit-remove-attachment"
-        onClick={onRemove}
-        aria-label={`Remover ${fileName}`}
-      >
-        <X size={16} />
-      </button>
-    </div>
-  );
-}
-
-function AttachmentsEditor({ attachments, addAttachments, removeAttachment }) {
-  const handleDrop = (event) => {
-    event.preventDefault();
-
-    const files = event.dataTransfer.files;
-
-    if (files.length > 0) {
-      addAttachments({
-        target: {
-          files,
-          value: "",
-        },
-      });
-    }
-  };
-
-  return (
-    <div className="edit-attachments">
-      <label
-        className="edit-upload-area"
-        onDrop={handleDrop}
-        onDragOver={(event) => event.preventDefault()}
-      >
-        <Upload size={30} />
-
-        <strong>
-          Arraste ou <span>selecione</span>
-        </strong>
-
-        <small>PDF, DOCX, XLSX</small>
-
-        <input type="file" multiple hidden onChange={addAttachments} />
-      </label>
-
-      <div className="edit-attachments-list">
-        {attachments.length === 0 ? (
-          <span className="edit-empty-attachments">Nenhum arquivo adicionado</span>
-        ) : (
-          attachments.map((attachment, index) => (
-            <AttachmentItem
-              key={`${attachment.name || attachment.nome}-${index}`}
-              attachment={attachment}
-              onRemove={() => removeAttachment(index)}
-            />
-          ))
-        )}
-      </div>
-    </div>
   );
 }
 
@@ -425,10 +325,6 @@ function EditProcurement() {
     return <p>Carregando licitação...</p>;
   }
 
-  const getOptionLabel = (options, value) => {
-    return options.find((option) => option.value === value)?.label || value;
-  };
-
   const tituloLicitacao = `${getOptionLabel(PROCUREMENT_TYPES, formData.tipo)} nº ${formData.numero}/${formData.ano}`;
 
   return (
@@ -598,232 +494,4 @@ function EditProcurement() {
   );
 }
 
-<<<<<<< HEAD
 export default EditProcurement;
-=======
-function PageHeader({ licitacao }) {
-  const titulo = `Pregão Eletrônico nº ${licitacao.numero || "---"}/${licitacao.ano || "----"}`;
-
-  return (
-    <div className="page-header">
-      <div className="page-header-esquerda">
-        <button className="btn-back" type="button">
-          <ArrowLeft size={18} />
-        </button>
-        <div className="titulo">
-          <h1>Editar Licitação</h1>
-          <p>Altere informações da licitação</p>
-        </div>
-      </div>
-      <div className="page-header-direita">
-        <div className="breadcrumb">
-          <Home size={14} />
-          <span>/</span>
-          <span>Licitações</span>
-          <span>/</span>
-          <span className="breadcrumb-ativo">{titulo}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EditarCard({ licitacao, onChange }) {
-  const titulo = `${licitacao.tipo || "Licitação"} nº ${licitacao.numero || "---"}/${licitacao.ano || "----"}`;
-
-  return (
-    <div className="licitacao-card">
-      <div className="licitacao-card-header">
-        <div className="licitacao-card-titulo">
-          <h2>{titulo}</h2>
-          <p>Criada em {licitacao.dataCriacao || "Data não informada"}</p>
-        </div>
-        <div className="licitacao-card-acoes">
-          <ButtonAction className="btn-excluir" icon={Trash2}>Excluir</ButtonAction>
-          <ButtonAction className="btn-cancelar" icon={X}>Cancelar</ButtonAction>
-          <ButtonAction className="btn-salvar" icon={Save}>Salvar</ButtonAction>
-        </div>
-      </div>
-
-      <div className="cards-linha-1">
-        <CardIdentificacao licitacao={licitacao} onChange={onChange} />
-        <CardDescricao licitacao={licitacao} onChange={onChange} />
-        <CardDatas licitacao={licitacao} onChange={onChange} />
-      </div>
-
-      <div className="cards-linha-2">
-        <CardClassificacao licitacao={licitacao} onChange={onChange} />
-        <CardFinanceiro licitacao={licitacao} onChange={onChange} />
-        <CardOrigem licitacao={licitacao} onChange={onChange} />
-        <CardAnexos licitacao={licitacao} onChange={onChange} />
-      </div>
-    </div>
-  );
-}
-
-function CardIdentificacao({ licitacao, onChange }) {
-  return (
-    <CardSection icon={IdCard} title="Identificação">
-      <div className="card-linha">
-        <FormInput label="Número" value={licitacao.numero} onChange={(valor) => onChange("numero", valor)} />
-        <FormInput label="Ano" value={licitacao.ano} onChange={(valor) => onChange("ano", valor)} />
-      </div>
-      <FormSelect label="Tipo de Licitação" value={licitacao.tipo} options={tiposLicitacao} onChange={(valor) => onChange("tipo", valor)} />
-      <FormSelect label="Status" value={licitacao.status} options={statusLicitacao} onChange={(valor) => onChange("status", valor)} />
-    </CardSection>
-  );
-}
-
-function CardDescricao({ licitacao, onChange }) {
-  return (
-    <CardSection icon={Pencil} title="Descrição">
-      <FormTextarea label="Objeto" value={licitacao.objeto} onChange={(valor) => onChange("objeto", valor)} />
-      <FormTextarea label="Descrição do Objeto" value={licitacao.descricao} onChange={(valor) => onChange("descricao", valor)} />
-    </CardSection>
-  );
-}
-
-function CardDatas({ licitacao, onChange }) {
-  return (
-    <CardSection icon={CalendarDays} title="Datas">
-      <FormInput label="Data de Publicação" type="date" value={licitacao.dataPublicacao} onChange={(valor) => onChange("dataPublicacao", valor)} />
-      <FormInput label="Data de Abertura" type="date" value={licitacao.dataAbertura} onChange={(valor) => onChange("dataAbertura", valor)} />
-    </CardSection>
-  );
-}
-
-function CardClassificacao({ licitacao, onChange }) {
-  return (
-    <CardSection icon={FolderOpen} title="Classificação">
-      <FormSelect label="Classificação" value={licitacao.classificacao} options={classificacoes} onChange={(valor) => onChange("classificacao", valor)} />
-    </CardSection>
-  );
-}
-
-function CardFinanceiro({ licitacao, onChange }) {
-  return (
-    <CardSection icon={CircleDollarSign} title="Financeiro">
-      <FormInput label="Valor Estimado" value={licitacao.valorEstimado} onChange={(valor) => onChange("valorEstimado", valor)} />
-    </CardSection>
-  );
-}
-
-function CardOrigem({ licitacao, onChange }) {
-  return (
-    <CardSection icon={Landmark} title="Origem">
-      <FormSelect label="Secretaria Responsável" value={licitacao.secretaria} options={secretarias} onChange={(valor) => onChange("secretaria", valor)} />
-    </CardSection>
-  );
-}
-
-function CardAnexos({ licitacao, onChange }) {
-  function handleAdd(e) {
-    const novos = Array.from(e.target.files)
-    onChange("anexos", [...licitacao.anexos, ...novos])
-  }
-
-  function handleRemove(index) {
-    onChange("anexos", licitacao.anexos.filter((_, i) => i !== index))
-  }
-
-  function removerTodos() {
-    onChange("anexos", [])
-  }
-
-  return (
-    <CardSection
-      icon={Paperclip}
-      title="Anexos"
-      action={
-        <button className="btn-excluir-todos" type="button" onClick={removerTodos}>
-          <X size={14} />
-          Excluir todos
-        </button>
-      }
-    >
-      <div className="card-anexos">
-        <label className="upload-area">
-          <Paperclip size={28} className="upload-icon" />
-          <p>Arraste ou <span className="upload-link">clique para selecionar</span></p>
-          <p className="upload-info">PDF, DOCX, XLSX</p>
-          <input type="file" multiple hidden onChange={handleAdd} />
-        </label>
-        {licitacao.anexos.length > 0 && (
-          <div className="anexos-lista">
-            <p className="anexos-titulo">Arquivos ({licitacao.anexos.length})</p>
-            {licitacao.anexos.map((anexo, index) => (
-              <div className="anexo-item" key={index}>
-                <div className="anexo-info">
-                  <div>
-                    <p className="card-valor">{anexo.name ?? anexo.nome}</p>
-                    <span className="card-label">
-                      {anexo.size ? `${(anexo.size / 1024).toFixed(0)} KB` : anexo.tamanho}
-                    </span>
-                  </div>
-                </div>
-                <button className="btn-remover-anexo" type="button" onClick={() => handleRemove(index)}>
-                  <X size={15} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </CardSection>
-  )
-}
-
-function CardSection({ icon: Icon, title, children, action, className = "" }) {
-  return (
-    <div className={`card ${className}`}>
-      <div className="card-header">
-        <Icon size={18} />
-        <h3>{title}</h3>
-        {action}
-      </div>
-      <div className="card-body">{children}</div>
-    </div>
-  );
-}
-
-function FormInput({ label, value, onChange, type = "text" }) {
-  return (
-    <label className="campo">
-      <span className="card-label">{label}</span>
-      <input className="input" type={type} value={value} onChange={(e) => onChange(e.target.value)} />
-    </label>
-  );
-}
-
-function FormTextarea({ label, value, onChange }) {
-  return (
-    <label className="campo">
-      <span className="card-label">{label}</span>
-      <textarea className="input input-textarea" value={value} onChange={(e) => onChange(e.target.value)} />
-    </label>
-  );
-}
-
-function FormSelect({ label, value, options, onChange }) {
-  return (
-    <label className="campo">
-      <span className="card-label">{label}</span>
-      <select className="input" value={value} onChange={(e) => onChange(e.target.value)}>
-        <option value="" disabled>Selecione</option>
-        {options.map((option) => (
-          <option value={option} key={option}>{option}</option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function ButtonAction({ children, icon: Icon, className }) {
-  return (
-    <button className={className} type="button">
-      <Icon size={16} />
-      {children}
-    </button>
-  );
-}
->>>>>>> 7e199fd45db4007b1cfcd3f47b3374dde7c6fd18

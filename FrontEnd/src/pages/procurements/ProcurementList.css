@@ -141,7 +141,7 @@ html, body {
 .input-search input::placeholder{
     font-size: 25px;
     position: relative;
-    left: 10px;
+    left: 2px;
     top: 2px;
 }
 

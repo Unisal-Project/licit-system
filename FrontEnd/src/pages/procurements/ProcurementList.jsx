@@ -7,7 +7,7 @@ import { Button, Input } from "../../components/ui/main.js";
 import { statusOptions, tipoOptions, origemOptions, filterProcurements, paginateItems, getStatusColor } from "../../components/shared/procurementListUtils.js";
 import { getCurrentProcurementStatus } from "../../components/shared/procurementDeadline.js"
 import { getAllProcurements } from "../../services/procurementService.js";
-import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
+import { PROCUREMENT_TYPES, SECRETARIAS, getOptionLabel } from "../../utils/procurementOptions";
 
 function ProcurementList() {
     const navigate = useNavigate();
@@ -99,10 +99,15 @@ function ProcurementList() {
 
         const search = searchTerm.toLowerCase();
 
-        const tipoLabel = getOptionLabel(
+        const tipoLabel = String(getOptionLabel(
             PROCUREMENT_TYPES,
             procurement.tipo
-        ).toLowerCase();
+        ) || "").toLowerCase();
+
+        const origemLabel = String(getOptionLabel(
+            SECRETARIAS,
+            procurement.origem
+        ) || "").toLowerCase();
 
         return (
             `${procurement.numero}/${procurement.ano}`
@@ -111,9 +116,7 @@ function ProcurementList() {
 
             tipoLabel.includes(search) ||
 
-            procurement.origem
-                ?.toLowerCase()
-                .includes(search) ||
+            origemLabel.includes(search) ||
 
             procurement.objeto
                 ?.toLowerCase()
@@ -194,7 +197,7 @@ function ProcurementList() {
                                                     )
                                                 }
                                             >
-                                                <span>{status.value}</span>
+                                                <span>{status.label}</span>
                                                 <span
                                                     className={`status-dot ${status.dotClass}`}
                                                 ></span>
@@ -233,19 +236,20 @@ function ProcurementList() {
                                     <div className="filter-grid origin-grid">
                                         {origemOptions.map((origin) => (
                                             <button
-                                                key={origin}
+                                                key={origin.value}
+                                                title={origin.label}
                                                 className={`filter-pill origin-pill ${
-                                                    selectedOrigem === origin ? "active" : ""
+                                                    selectedOrigem === origin.value ? "active" : ""
                                                 }`}
                                                 onClick={() =>
                                                     toggleFilter(
                                                         selectedOrigem,
-                                                        origin,
+                                                        origin.value,
                                                         setSelectedOrigem
                                                     )
                                                 }
                                             >
-                                                {origin}
+                                                {origin.value}
                                             </button>
                                         ))}
                                     </div>
@@ -328,7 +332,9 @@ function ProcurementList() {
                                     >
                                         <td>{item.numero}/{item.ano}</td>
                                         <td>{getOptionLabel(PROCUREMENT_TYPES, item.tipo)}</td>
-                                        <td>{item.origem}</td>
+                                        <td title={getOptionLabel(SECRETARIAS, item.origem)}>
+                                            {item.origem}
+                                        </td>
                                         <td>{item.publicacao}</td>
                                         <td>{item.abertura}</td>
                                         <td>

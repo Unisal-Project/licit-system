@@ -1,18 +1,42 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useState } from "react"
+import Select from "react-select";
 import Sidebar from '../../components/layout/Sidebar';
 import Input  from "../../components/ui/Input/Input"
 import Button from "../../components/ui/Button/Button"
-import { Home, ArrowLeft, Upload, Copy, AlertCircle, User, Lock } from "lucide-react"
+import { Home, ArrowLeft, Copy, AlertCircle, User, Lock, Link } from "lucide-react"
+import { useNavigate } from 'react-router-dom';
+import { customSelectStyles } from "../../components/shared/styleSelect";
 import "./RemoteAccess.css"
 
+const PERFIL_OPTIONS = [
+  { value: "Apenas visualização", label: "Apenas visualização" },
+  { value: "Editor", label: "Editor" },
+  { value: "Administrador", label: "Administrador" },
+];
+
+const VALIDADE_OPTIONS = [
+  { value: "7 dias", label: "7 dias" },
+  { value: "15 dias", label: "15 dias" },
+  { value: "30 dias", label: "30 dias" },
+];
+
+const getSelectedOption = (options, value) => {
+  return options.find((option) => option.value === value) || null;
+};
+
 function PageHeader() {
+  const navigate = useNavigate();
+  
   return (
     <div className="page-header">
       <div className="page-header-esquerda">
-        <button className="btn-back">
-          <ArrowLeft size={18} />
+        <button
+          type="button"
+          className="back-button-create"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft size={26} />
         </button>
         <div>
           <h1>Acesso Remoto</h1>
@@ -31,6 +55,9 @@ function PageHeader() {
 }
 
 function RemoteAccess() {
+  const selectMenuPortalTarget =
+    typeof document !== "undefined" ? document.body : undefined;
+
   const [dados, setDados] = useState({
     usuario: "",
     senha: "",
@@ -58,7 +85,7 @@ function RemoteAccess() {
   }
 
   return (
-    <div className="wrapper">
+    <div className="wrapper remote-access-page">
       <Sidebar />
       <main className="main">
         <PageHeader />
@@ -80,6 +107,7 @@ function RemoteAccess() {
               <div className="campo">
                 <label>Usuário de acesso</label>
                 <Input
+                  className="input-user"
                   icon={User}
                   placeholder="Nome"
                   value={dados.usuario}
@@ -89,6 +117,7 @@ function RemoteAccess() {
               <div className="campo">
                 <label>Senha de acesso</label>
                 <Input
+                  className="input-senha"
                   isPassword={true}
                   icon={Lock}
                   placeholder="••••••••"
@@ -101,31 +130,35 @@ function RemoteAccess() {
             <div className="campos-linha">
               <div className="campo">
                 <label>Perfil de acesso</label>
-                <div className="select-wrapper">
-                  <select
-                    value={dados.perfil}
-                    onChange={(e) => handleChange('perfil', e.target.value)}
-                  >
-                    <option value="" disabled>Selecione</option>
-                    <option>Apenas visualização</option>
-                    <option>Editor</option>
-                    <option>Administrador</option>
-                  </select>
-                </div>
+                <Select
+                  classNamePrefix="remote-react-select"
+                  options={PERFIL_OPTIONS}
+                  placeholder="Selecione"
+                  value={getSelectedOption(PERFIL_OPTIONS, dados.perfil)}
+                  onChange={(selectedOption) =>
+                    handleChange("perfil", selectedOption ? selectedOption.value : "")
+                  }
+                  styles={customSelectStyles}
+                  isSearchable={false}
+                  menuPortalTarget={selectMenuPortalTarget}
+                  menuPosition="fixed"
+                />
               </div>
               <div className="campo">
                 <label>Validade do Link</label>
-                <div className="select-wrapper">
-                  <select
-                    value={dados.validade}
-                    onChange={(e) => handleChange('validade', e.target.value)}
-                  >
-                    <option value="" disabled>Selecione</option>
-                    <option>7 dias</option>
-                    <option>15 dias</option>
-                    <option>30 dias</option>
-                  </select>
-                </div>
+                <Select
+                  classNamePrefix="remote-react-select"
+                  options={VALIDADE_OPTIONS}
+                  placeholder="Selecione"
+                  value={getSelectedOption(VALIDADE_OPTIONS, dados.validade)}
+                  onChange={(selectedOption) =>
+                    handleChange("validade", selectedOption ? selectedOption.value : "")
+                  }
+                  styles={customSelectStyles}
+                  isSearchable={false}
+                  menuPortalTarget={selectMenuPortalTarget}
+                  menuPosition="fixed"
+                />
               </div>
             </div>
 
@@ -140,13 +173,9 @@ function RemoteAccess() {
             </div>
 
             <div className="acesso-botoes">
-              <Button variant="primary" onClick={handleGerarLink}>
-                <i className="bi bi-link-45deg"></i>
+              <Button variant="primary" onClick={handleGerarLink} className="btn-gerar">
+                <Link size={18} />
                 Gerar Link de Acesso
-              </Button>
-              <Button variant="segundary">
-                <i className="bi bi-envelope"></i>
-                Enviar por E-mail
               </Button>
             </div>
           </div>

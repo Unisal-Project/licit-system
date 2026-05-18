@@ -1,3 +1,5 @@
+import { SECRETARIAS } from "../../utils/procurementOptions";
+
 export const statusOptions = [
     { label: "Aguardando Abertura", value: "aguardando_abertura", dotClass: "gray", extraClass: "large-status" },
     { label: "Aberto", value: "aberto", dotClass: "green" },
@@ -12,11 +14,7 @@ export const tipoOptions = [
     { label: "Concorrência Pública", value: "concorrencia_publica" },
 ];
 
-export const origemOptions = [
-    "SEGOV", "SEFAZ", "SEAD", "SEFI", "SEMEC", "SEMUS", "SEESP",
-    "SMSP", "SEAS", "SEPCD", "SEMDH", "SEC", "SEPP", "SEOS",
-    "SEMA", "SEDU", "SEDET", "SEAJ",
-];
+export const origemOptions = SECRETARIAS;
 
 export function filterProcurements(procurements, filters) {
     const { status, tipo, origem } = filters;

@@ -28,7 +28,7 @@
           "tipo": "docx"
         }
       ],
-      "id": 1
+      "id": "1"
     },
     {
       "numero": "022",
@@ -56,7 +56,7 @@
           "tipo": "docx"
         }
       ],
-      "id": 2
+      "id": "2"
     },
     {
       "numero": "023",
@@ -79,7 +79,7 @@
           "tipo": "docx"
         }
       ],
-      "id": 3
+      "id": "3"
     },
     {
       "numero": "024",
@@ -102,7 +102,7 @@
           "tipo": "docx"
         }
       ],
-      "id": 4
+      "id": "4"
     },
     {
       "numero": "025",
@@ -125,7 +125,7 @@
           "tipo": "docx"
         }
       ],
-      "id": 5
+      "id": "5"
     },
     {
       "numero": "027",
@@ -134,7 +134,7 @@
       "origem": "SEMUS",
       "publicacao": "17/05/2026",
       "abertura": "18/05/2026",
-      "status": "aguardando_abertura",
+      "status": "aberto",
       "objeto": "teste para modficar",
       "descricao": "detalhe do teste",
       "classificacao": "por_item",
@@ -160,7 +160,7 @@
           "tipo": "pdf"
         }
       ],
-      "id": 7
+      "id": "7"
     },
     {
       "numero": "026",
@@ -177,7 +177,7 @@
       "secretaria": "Secretaria de Governo",
       "criadoEm": "17/05/2026, 21:40:07",
       "anexos": [],
-      "id": 8
+      "id": "8"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
