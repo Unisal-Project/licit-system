@@ -1,15 +1,15 @@
 export const statusOptions = [
-    { label: "Aguardando Abertura", dotClass: "gray", extraClass: "large-status" },
-    { label: "Aberto", dotClass: "green" },
-    { label: "Em Andamento", dotClass: "blue", extraClass: "large-status" },
-    { label: "Suspenso", dotClass: "red" },
-    { label: "Revogado", dotClass: "orange" },
-    { label: "Finalizado", dotClass: "dark" },
+    { label: "Aguardando Abertura", value: "aguardando_abertura", dotClass: "gray", extraClass: "large-status" },
+    { label: "Aberto", value: "aberto", dotClass: "green" },
+    { label: "Em Andamento", value: "em_andamento", dotClass: "blue", extraClass: "large-status" },
+    { label: "Suspenso", value: "suspenso", dotClass: "red" },
+    { label: "Revogado", value: "revogado", dotClass: "orange" },
+    { label: "Finalizado", value: "finalizado", dotClass: "dark" },
 ];
 
 export const tipoOptions = [
-    { label: "Pregão Eletrônico", value: "Pregao Eletronico" },
-    { label: "Concorrência Pública", value: "Concorrencia Publica" },
+    { label: "Pregão Eletrônico", value: "pregao_eletronico" },
+    { label: "Concorrência Pública", value: "concorrencia_publica" },
 ];
 
 export const origemOptions = [

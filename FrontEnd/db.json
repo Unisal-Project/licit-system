@@ -1,0 +1,184 @@
+{
+  "procurements": [
+    {
+      "numero": "021",
+      "ano": "2026",
+      "tipo": "pregao_eletronico",
+      "origem": "SEGOV",
+      "publicacao": "11/05/2026",
+      "abertura": "16/05/2026",
+      "status": "aberto",
+      "objeto": "Aquisição de equipamentos de informática para modernização administrativa.",
+      "descricao": "Aquisição de computadores, notebooks e impressoras para atender às demandas da Secretaria de Administração.",
+      "classificacao": "global",
+      "valorEstimado": "R$ 350.000,00",
+      "secretaria": "Secretaria de Governo",
+      "criadoEm": "11/05/2026 às 14:30",
+      "atualizadoEm": "17/05/2026, 22:26:52",
+      "atualizadoEmISO": "2026-05-18T01:26:52.761Z",
+      "anexos": [
+        {
+          "nome": "edital.pdf",
+          "tamanho": "1.2 MB",
+          "tipo": "pdf"
+        },
+        {
+          "nome": "termo_referencia.docx",
+          "tamanho": "855 KB",
+          "tipo": "docx"
+        }
+      ],
+      "id": 1
+    },
+    {
+      "numero": "022",
+      "ano": "2026",
+      "tipo": "concorrencia_publica",
+      "origem": "SEAD",
+      "publicacao": "11/05/2026",
+      "abertura": "13/05/2026",
+      "status": "em_andamento",
+      "objeto": "Aquisição de equipamentos de informática para modernização administrativa.",
+      "descricao": "Aquisição de computadores, notebooks e impressoras para atender às demandas da Secretaria de Administração.",
+      "classificacao": "global",
+      "valorEstimado": "R$ 350.000,00",
+      "secretaria": "Secretaria de Administração",
+      "criadoEm": "11/05/2026 às 14:30",
+      "anexos": [
+        {
+          "nome": "edital.pdf",
+          "tamanho": "1.2 MB",
+          "tipo": "pdf"
+        },
+        {
+          "nome": "termo_referencia.docx",
+          "tamanho": "855 KB",
+          "tipo": "docx"
+        }
+      ],
+      "id": 2
+    },
+    {
+      "numero": "023",
+      "ano": "2026",
+      "tipo": "concorrencia_publica",
+      "origem": "SEAD",
+      "publicacao": "13/05/2026",
+      "abertura": "14/05/2026",
+      "status": "suspenso",
+      "objeto": "teste",
+      "descricao": "teste de criação",
+      "classificacao": "global",
+      "valorEstimado": "R$ 2.000,00",
+      "secretaria": "Secretaria de Administração",
+      "criadoEm": "13/05/2026, 09:39:30",
+      "anexos": [
+        {
+          "nome": "PadraoState_Ecommerce.docx",
+          "tamanho": "14 KB",
+          "tipo": "docx"
+        }
+      ],
+      "id": 3
+    },
+    {
+      "numero": "024",
+      "ano": "2025",
+      "tipo": "pregao_eletronico",
+      "origem": "SEGOV",
+      "publicacao": "13/05/2026",
+      "abertura": "14/05/2026",
+      "status": "revogado",
+      "objeto": "teste2",
+      "descricao": "teste de criação2",
+      "classificacao": "global",
+      "valorEstimado": "R$ 300,00",
+      "secretaria": "Secretaria de Governo",
+      "criadoEm": "13/05/2026, 10:02:55",
+      "anexos": [
+        {
+          "nome": "PadraoState_Ecommerce.docx",
+          "tamanho": "14 KB",
+          "tipo": "docx"
+        }
+      ],
+      "id": 4
+    },
+    {
+      "numero": "025",
+      "ano": "2026",
+      "tipo": "pregao_eletronico",
+      "origem": "SEGOV",
+      "publicacao": "06/05/2026",
+      "abertura": "13/05/2026",
+      "status": "aberto",
+      "objeto": "teste 3",
+      "descricao": "teste de criação 3",
+      "classificacao": "global",
+      "valorEstimado": "R$ 100,00",
+      "secretaria": "Secretaria de Governo",
+      "criadoEm": "13/05/2026, 10:14:52",
+      "anexos": [
+        {
+          "nome": "PadraoState_Ecommerce.docx",
+          "tamanho": "14 KB",
+          "tipo": "docx"
+        }
+      ],
+      "id": 5
+    },
+    {
+      "numero": "027",
+      "ano": "2026",
+      "tipo": "concorrencia_publica",
+      "origem": "SEMUS",
+      "publicacao": "17/05/2026",
+      "abertura": "18/05/2026",
+      "status": "aguardando_abertura",
+      "objeto": "teste para modficar",
+      "descricao": "detalhe do teste",
+      "classificacao": "por_item",
+      "valorEstimado": "R$ 300,00",
+      "secretaria": "Secretaria de Saúde",
+      "criadoEm": "17/05/2026, 20:38:56",
+      "atualizadoEm": "17/05/2026, 22:27:17",
+      "atualizadoEmISO": "2026-05-18T01:27:17.882Z",
+      "anexos": [
+        {
+          "nome": "Itens Adjudicados PC 377.xlsx",
+          "tamanho": "18 KB",
+          "tipo": "xlsx"
+        },
+        {
+          "nome": "PadraoState_Ecommerce.docx",
+          "tamanho": "14 KB",
+          "tipo": "docx"
+        },
+        {
+          "nome": "PADRÃO DE PROJETO ESTRUTURAL.pdf",
+          "tamanho": "2440 KB",
+          "tipo": "pdf"
+        }
+      ],
+      "id": 7
+    },
+    {
+      "numero": "026",
+      "ano": "2026",
+      "tipo": "concorrencia_publica",
+      "origem": "SEGOV",
+      "publicacao": "16/05/2026",
+      "abertura": "17/05/2026",
+      "status": "aberto",
+      "objeto": "teste para status aberto",
+      "descricao": "decricao do teste",
+      "classificacao": "por_lote",
+      "valorEstimado": "R$ 10,00",
+      "secretaria": "Secretaria de Governo",
+      "criadoEm": "17/05/2026, 21:40:07",
+      "anexos": [],
+      "id": 8
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

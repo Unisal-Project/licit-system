@@ -9,7 +9,9 @@
     --bg-dark: #1F2937;
     --text-primary: #1F2937;
     --text-secondary: #9CA3AF;
-    --aguardando: #4e4e4e;
+    --aguardando: #777777;
+    --select: #2564eb42;
+    --active: #a6a6a7;
 }
 
 body {

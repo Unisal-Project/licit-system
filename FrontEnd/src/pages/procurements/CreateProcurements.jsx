@@ -1,385 +1,560 @@
-import React, { useState } from "react"
-import Input  from "../../components/ui/Input/Input"
-import Button from "../../components/ui/Button/Button"
-import Sidebar from "../../components/layout/Sidebar"
-import {Home, Upload, X, FileText, ArrowLeft} from "lucide-react"
+import React, { useMemo, useState } from "react";
+import Select from "react-select";
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+import Sidebar from "../../components/layout/Sidebar";
+import { Button, Input } from "../../components/ui/main";
+import { ArrowLeft, CalendarDays, FileText, Folder, Home, Landmark, Paperclip, Pencil, Save, Upload, UserRoundCog, X, CircleDollarSign } from "lucide-react"
+import { createProcurement } from "../../services/procurementService";
+import { customSelectStyles } from "../../components/shared/styleSelect";
+import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
 import "./CreateProcurements.css"
-import {Link} from "react-router-dom";
+
+
+const INITIAL_FORM_DATA = {
+  numero: "",
+  ano: "",
+  tipo: "",
+  origem: "",
+  status: "aguardando_abertura",
+  objeto: "",
+  descricao: "",
+  classificacao: "",
+  valorEstimado: "",
+  dataPublicacao: "",
+  dataAbertura: "",
+  secretaria: "",
+};
 
 function PageHeader() {
+  const navigate = useNavigate();
+  
   return (
-    <div className="page-header">
-      <div className="page-header-esquerda">
-        <Link to="/ProcurementList" className="back-button">
-          <ArrowLeft size={26} />
-        </Link>
+    <header className="page-header">
+      <div className="page-header-left">
+        <button
+            type="button"
+            className="back-button-create"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft size={26} />
+          </button>
+
         <div>
           <h1>Nova Licitação</h1>
           <p>Preencha os dados para criar uma nova licitação</p>
         </div>
       </div>
-      <div className="breadcrumb">
-        <Home size={14} />
+
+      <nav className="breadcrumb" aria-label="breadcrumb">
+        <Home size={15} />
         <span>/</span>
         <span>Licitações</span>
         <span>/</span>
-        <span className="breadcrumb-ativo">Nova Licitação</span>
-      </div>
-    </div>
-  )
+        <strong>Nova Licitação</strong>
+      </nav>
+    </header>
+  );
 }
 
-function CardIdentificacao({ dados, onChange }) {
+function FormCard({ icon: Icon, title, subtitle, className = "", children }) {
   return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-person-badge"></i>
+    <section className={`form-card ${className}`}>
+      <div className="form-card-header">
+        <Icon size={34} strokeWidth={1.8} />
         <div>
-          <h3>Identificação</h3>
-          <p>Informe os dados básicos da licitação</p>
+          <h2>{title}</h2>
+          <p>{subtitle}</p>
         </div>
       </div>
-      <div className="card-body">
-        <div className="campo-linha">
-          <div className="campo">
-            <label>Numero:</label>
-            <Input
-              placeholder="Ex.: 123"
-              value={dados.numero}
-              onChange={(e) => onChange('numero', e.target.value)}
-            />
-          </div>
-          <div className="campo campo-pequeno">
-            <label>Ano:</label>
-            <Input
-              placeholder="2026"
-              value={dados.ano}
-              onChange={(e) => onChange('ano', e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="campo-linha">
-          <div className="campo">
-            <label>Tipo de Licitação:</label>
-            <div className="select-wrapper">
-              <select
-                value={dados.tipo}
-                onChange={(e) => onChange('tipo', e.target.value)}
-              >
-                <option>Selecione</option>
-                <option>Pregão Eletrônico</option>
-                <option>Concorrência</option>
-                <option>Tomada de Preços</option>
-                <option>Convite</option>
-              </select>
-            </div>
-          </div>
-          <div className="campo">
-            <label>Status:</label>
-            <div className="select-wrapper">
-              <select
-                value={dados.status}
-                onChange={(e) => onChange('status', e.target.value)}
-              >
-                <option>Selecione</option>
-                <option>Aberto</option>
-                <option>Fechado</option>
-                <option>Cancelado</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+      <div className="form-card-body">{children}</div>
+    </section>
+  );
 }
 
-function CardDescricao({ dados, onChange }) {
+function Field({ label, children, className = "" }) {
   return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-pencil"></i>
-        <div>
-          <h3>Descrição</h3>
-          <p>Descreva o objeto da licitação</p>
-        </div>
+    <div className={`field ${className}`}>
+      {label && <label>{label}</label>}
+      {children}
+    </div>
+  );
+}
+
+function TextareaField({ label, value, onChange, placeholder = "" }) {
+  return (
+    <label className="edit-field">
+      <span>{label}</span>
+
+      <textarea
+        value={value || ""}
+        placeholder={placeholder}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </label>
+  );
+}
+
+function SelectField({ label, value, onChange, options, placeholder = "Selecione", className = "" }) {
+  const formattedOptions = options.map((option) => {
+    if (typeof option === "string") {
+      return {
+        value: option,
+        label: option,
+      };
+    }
+
+    return {
+      value: option.value,
+      label: option.label,
+    };
+  });
+
+  const safeValue =
+    typeof value === "object" && value !== null ? value.value : value;
+
+  const selectedOption =
+    formattedOptions.find((option) => option.value === safeValue) || null;
+
+  return (
+    <label className={`create-field ${className}`}>
+      <span>{label}</span>
+
+      <Select
+        classNamePrefix="create-react-select"
+        options={formattedOptions}
+        placeholder={placeholder}
+        value={selectedOption}
+        onChange={(selectedOption) => {
+          onChange(selectedOption ? selectedOption.value : "");
+        }}
+        styles={customSelectStyles}
+        isSearchable
+        noOptionsMessage={() => "Nenhuma opção encontrada"}
+        menuPortalTarget={document.body}
+        menuPosition="fixed"
+      />
+    </label>
+  );
+}
+
+function DateField({ label, value, onChange }) {
+  const inputRef = React.useRef(null);
+
+  const openCalendar = () => {
+    inputRef.current?.showPicker?.();
+    inputRef.current?.focus();
+  };
+
+  return (
+    <label className="edit-field">
+      <span>{label}</span>
+
+      <div className="date-input-container">
+        <button
+          type="button"
+          className="date-icon-button"
+          onClick={openCalendar}
+        >
+          <CalendarDays size={22} />
+        </button>
+
+        <input
+          ref={inputRef}
+          type="date"
+          value={value || ""}
+          onChange={(event) => onChange(event.target.value)}
+        />
       </div>
-      <div className="card-body">
-        <div className="campo">
-          <label>Objeto:</label>
+    </label>
+  );
+}
+
+function CardIdentificacao({ formData, updateField }) {
+  return (
+    <FormCard icon={UserRoundCog} title="Identificação" subtitle="Informe os dados básicos da licitação" className="card-identificacao">
+      <div className="field-row two-columns">
+        <label className="edit-field">
+          <span>Número:</span>
+
           <Input
-            placeholder="Digite o objeto da licitação"
-            value={dados.objeto}
-            onChange={(e) => onChange('objeto', e.target.value)}
-          />
-        </div>
-        <div className="campo">
-          <label>Descrição do Objeto:</label>
-          <textarea
-            className="textarea"
-            placeholder="Detalhe o objeto, especificações e informações complementares..."
-            value={dados.descricao}
-            onChange={(e) => onChange('descricao', e.target.value)}
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
+            placeholder="Ex.: 123"
+            value={formData.numero}
+            icon={FileText}
+            onChange={(event) => {
+              const onlyNumber = String(event.target.value || "").replace(/\D/g, "");
 
-function CardClassificacao({ dados, onChange }) {
-  return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-folder"></i>
-        <div>
-          <h3>Classificação</h3>
-          <p>Defina a Classificação</p>
-        </div>
-      </div>
-      <div className="card-body">
-        <div className="campo">
-          <label>Classificação:</label>
-          <div className="select-wrapper">
-            <select
-              value={dados.classificacao}
-              onChange={(e) => onChange('classificacao', e.target.value)}
-            >
-             <option value="" disabled>Defina a Classificação</option>
-              <option>Global</option>
-              <option>Por Item</option>
-              <option>Por Lote</option>
-            </select>
-          </div>
-        </div>
-        <Button variant="segundary">
-          <Upload size={16}/>
-          Panilha Excel (.xlsx)
-        </Button>
-      </div>
-    </div>
-  )
-}
-
-function CardFinanceiro({ dados, onChange }) {
-  return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-currency-dollar"></i>
-        <div>
-          <h3>Financeiro</h3>
-          <p>Informe o valor estimado</p>
-        </div>
-      </div>
-      <div className="card-body">
-        <div className="campo">
-          <label>Valor Estimado:</label>
-          <Input
-            placeholder="R$ 00,00"
-            value={dados.valorEstimado}
-            onChange={(e) => onChange('valorEstimado', e.target.value)}
+              updateField("numero", onlyNumber);
+            }}
           />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function CardDatas({ dados, onChange }) {
-  return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-calendar"></i>
-        <div>
-          <h3>Datas</h3>
-          <p>Defina as datas importantes</p>
-        </div>
-      </div>
-      <div className="card-body">
-        <div className="campo">
-          <label>Data de Publicação:</label>
-          <input
-            className="input-date"
-            type="date"
-            value={dados.dataPublicacao}
-            onChange={(e) => onChange('dataPublicacao', e.target.value)}
-          />
-        </div>
-        <div className="campo">
-          <label>Data de Abertura:</label>
-          <input
-            className="input-date"
-            type="date"
-            value={dados.dataAbertura}
-            onChange={(e) => onChange('dataAbertura', e.target.value)}
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function CardOrigem({ dados, onChange }) {
-  return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-bank"></i>
-        <div>
-          <h3>Origem</h3>
-          <p>Selecione a secretaria responsável</p>
-        </div>
-      </div>
-      <div className="card-body">
-        <div className="campo">
-          <div className="select-wrapper">
-            <i className="bi bi-search select-search-icon"></i>
-           <select
-  value={dados.secretaria}
-  onChange={(e) => onChange('secretaria', e.target.value)}
->
-  <option value="" disabled>Procurar Secretaria</option>
-  <option>SEGOV</option>
-  <option>SEFAZ</option>
-  <option>SEAD</option>
-  <option>SEFI</option>
-  <option>SEMEC</option>
-  <option>SEMUS</option>
-  <option>SEESP</option>
-  <option>SMSP</option>
-  <option>SEAS</option>
-  <option>SEPCD</option>
-  <option>SEMDH</option>
-  <option>SEC</option>
-  <option>SEPP</option>
-  <option>SEOS</option>
-  <option>SEMA</option>
-  <option>SEDU</option>
-  <option>SEDET</option>
-  <option>SEAJ</option>
-</select>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function CardAnexos({ anexos, onAdd, onRemove }) {
-  return (
-    <div className="card">
-      <div className="card-titulo">
-        <i className="bi bi-paperclip"></i>
-        <div>
-          <h3>Anexos</h3>
-          <p>Faça upload dos arquivos relacionados</p>
-        </div>
-      </div>
-      <div className="card-body card-anexos">
-        <label className="upload-area">
-          <Upload size={32} className="upload-icon"/>
-          <p>Arraste os arquivos aqui ou <span className="upload-link">clique para selecionar</span></p>
-          <p className="upload-info">PDF, DOCX, XLSX </p>
-          <input type="file" multiple hidden onChange={onAdd}/>
         </label>
-        {anexos.length > 0 && (
-          <div className="anexos-lista">
-            <p className="anexos-titulo">Arquivos adicionados ({anexos.length})</p>
-            {anexos.map((anexo, index) => (
-              <div className="anexo-item" key={index}>
-                <div className="anexo-info">
-                  <FileText size={16}/>
-                  <div>
-                    <p>{anexo.name}</p>
-                    <span>{(anexo.size / 1024).toFixed(0)} KB</span>
-                  </div>
-                </div>
-                <button className="btn-remover" onClick={() => onRemove(index)}>
-                  <X size={16}/>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        
+        <label className="edit-field">
+          <span>Ano:</span>
+
+          <Input
+            placeholder="2026"
+            value={formData.ano}
+            icon={CalendarDays}
+            onChange={(event) => {
+              const onlyNumber = String(event.target.value || "")
+                .replace(/\D/g, "")
+                .slice(0, 4);
+
+              updateField("ano", onlyNumber);
+            }}
+          />
+        </label>
       </div>
+
+      <div className="field-row two-columns">
+        <SelectField 
+          className="tipo-licitacao-select"
+          label="Tipo de Licitação:" 
+          placeholder="Selecione" 
+          value={formData.tipo} 
+          onChange={(value) => updateField("tipo", value)} 
+          options={PROCUREMENT_TYPES} 
+        />
+      </div>
+    </FormCard>
+  );
+}
+
+function CardDescricao({ formData, updateField }) {
+  return (
+    <FormCard icon={Pencil} title="Descrição" subtitle="Descreva o objeto da licitação" className="card-descricao">
+      <label className="edit-field">
+        <span>Objeto:</span>
+
+        <Input
+          placeholder="Digite o objeto da licitação"
+          value={formData.objeto}
+          icon={Pencil}
+          onChange={(event) =>
+            updateField("objeto", event.target.value)
+          }
+        />
+      </label>
+
+      <TextareaField
+        label="Descrição do Objeto:"
+        placeholder="Detalhe o objeto, especificações e informações complementares..."
+        value={formData.descricao}
+        onChange={(value) => updateField("descricao", value)}
+      />
+    </FormCard>
+  );
+}
+
+function CardClassificacao({ formData, updateField }) {
+  return (
+    <FormCard icon={Folder} title="Classificação" subtitle="Defina a Classificação" className="card-classificacao">
+      <SelectField label="Classificação:" placeholder="Defina a Classificação" value={formData.classificacao} onChange={(value) => updateField("classificacao", value)} options={CLASSIFICATION_OPTIONS} />
+    </FormCard>
+  );
+}
+
+function CardFinanceiro({ formData, updateField }) {
+
+  const handleCurrencyChange = (value) => {
+
+    const numericValue = value.replace(/\D/g, "")
+
+    const formattedValue = new Intl.NumberFormat(
+      "pt-BR",
+      {
+        style: "currency",
+        currency: "BRL",
+      }
+    ).format(numericValue / 100)
+
+    updateField("valorEstimado", formattedValue)
+  }
+
+  return (
+    <FormCard
+      icon={CircleDollarSign}
+      title="Financeiro"
+      subtitle="Informe o valor estimado"
+      className="card-financeiro"
+    >
+      <label className="edit-field">
+        <span>Valor Estimado:</span>
+
+        <Input
+          placeholder="R$ 0,00"
+          value={formData.valorEstimado}
+          icon={CircleDollarSign}
+          onChange={(event) =>
+            handleCurrencyChange(event.target.value)
+          }
+        />
+      </label>
+    </FormCard>
+  )
+}
+
+function CardDatas({ formData, updateField }) {
+  return (
+    <FormCard icon={CalendarDays} title="Datas" subtitle="Defina as datas importantes" className="card-datas">
+      <div className="field-row two-columns">
+        <DateField
+          label="Data de Publicação:"
+          value={formData.dataPublicacao}
+          onChange={(value) => updateField("dataPublicacao", value)}
+        />
+
+        <DateField
+          label="Data de Abertura:"
+          value={formData.dataAbertura}
+          onChange={(value) => updateField("dataAbertura", value)}
+        />
+      </div>
+    </FormCard>
+  );
+}
+
+function CardOrigem({ formData, updateField }) {
+  return (
+    <FormCard
+      icon={Landmark}
+      title="Origem"
+      subtitle="Selecione a secretaria responsável"
+      className="card-origem"
+    >
+      <SelectField
+        label="Secretaria Responsável:"
+        options={SECRETARIAS}
+        placeholder="Procurar Secretaria"
+        value={formData.secretaria}
+        onChange={(value) => updateField("secretaria", value)}
+      />
+    </FormCard>
+  );
+}
+
+function AttachmentItem({ attachment, onRemove }) {
+  const sizeInKb = useMemo(() => `${Math.max(1, Math.round(attachment.size / 1024))} KB`, [attachment.size]);
+
+  return (
+    <div className="attachment-item">
+      <div className="attachment-info">
+        <FileText size={18} />
+        <div>
+          <p>{attachment.name}</p>
+          <span>{sizeInKb}</span>
+        </div>
+      </div>
+
+      <button type="button" className="remove-attachment" onClick={onRemove} aria-label={`Remover ${attachment.name}`}>
+        <X size={17} />
+      </button>
     </div>
+  );
+}
+
+function CardAnexos({ attachments, addAttachments, removeAttachment }) {
+  const handleDrop = (event) => {
+    event.preventDefault()
+
+    const files = event.dataTransfer.files
+
+    if (files.length > 0) {
+      addAttachments({
+        target: {
+          files,
+        },
+      })
+    }
+  }
+
+  const handleDragOver = (event) => {
+    event.preventDefault()
+  }
+
+  return (
+    <FormCard
+      icon={Paperclip}
+      title="Anexos"
+      subtitle="Faça upload dos arquivos relacionados"
+      className="card-anexos-wrapper"
+    >
+      <div className="attachments-layout">
+        <label
+          className="upload-area"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
+          <Upload size={38} />
+          <strong>
+            Arraste os arquivos aqui ou <span>clique para selecionar</span>
+          </strong>
+          <small>PDF, DOCX, XLSX • Máximo 10MB por arquivo</small>
+
+          <input type="file" multiple hidden onChange={addAttachments} />
+        </label>
+
+        <div className="attachments-list">
+          <p>Arquivos adicionados ({attachments.length})</p>
+
+          <div className="attachments-scroll">
+            {attachments.length === 0 ? (
+              <span className="empty-attachments">
+                Nenhum arquivo adicionado
+              </span>
+            ) : (
+              attachments.map((attachment, index) => (
+                <AttachmentItem
+                  key={`${attachment.name}-${attachment.size}-${index}`}
+                  attachment={attachment}
+                  onRemove={() => removeAttachment(index)}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </FormCard>
+  )
+}
+
+const formatDateToBrazilian = (date) => {
+  if (!date) return ""
+
+  const [year, month, day] = date.split("-")
+
+  return `${day}/${month}/${year}`
+}
+
+const getSelectedSecretaria = (value) => {
+  return SECRETARIAS.find(
+    (secretaria) => secretaria.value === value
   )
 }
 
 function CreateProcurements() {
-  const [dados, setDados] = useState({
-    numero: "",
-    ano: "",
-    tipo: "",
-    status: "",
-    objeto: "",
-    descricao: "",
-    classificacao: "",
-    valorEstimado: "",
-    dataPublicacao: "",
-    dataAbertura: "",
-    secretaria: "",
-  })
-  const [anexos, setAnexos] = useState([])
+  const navigate = useNavigate();
 
-  const handleChange = (campo, valor) => {
-    setDados(prev => ({ ...prev, [campo]: valor }))
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [attachments, setAttachments] = useState([]);
+
+  const updateField = (fieldName, value) => {
+    setFormData((currentData) => ({ ...currentData, [fieldName]: value }));
+  };
+
+  const addAttachments = (event) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    setAttachments((currentAttachments) => [...currentAttachments, ...selectedFiles]);
+    event.target.value = "";
+  };
+
+  const removeAttachment = (indexToRemove) => {
+    setAttachments((currentAttachments) =>
+      currentAttachments.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
+  const handleSave = async () => {
+
+    try {
+
+      const selectedSecretaria =
+        getSelectedSecretaria(formData.secretaria)
+
+      const newProcurement = {
+
+        numero: formData.numero,
+        ano: formData.ano,
+        tipo: formData.tipo,
+
+        origem: selectedSecretaria?.value || "",
+
+        publicacao: formatDateToBrazilian(
+          formData.dataPublicacao
+        ),
+
+        abertura: formatDateToBrazilian(
+          formData.dataAbertura
+        ),
+
+        status: formData.status,
+
+        objeto: formData.objeto,
+        descricao: formData.descricao,
+
+        classificacao: formData.classificacao,
+
+        valorEstimado: formData.valorEstimado,
+
+        secretaria: selectedSecretaria?.label || "",
+
+        criadoEm: new Date().toLocaleString("pt-BR"),
+        criadoEmISO: new Date().toISOString(),
+        atualizadoEm: new Date().toLocaleString("pt-BR"),
+        atualizadoEmISO: new Date().toISOString(),
+
+        anexos: attachments.map((file) => ({
+          nome: file.name,
+
+          tamanho: `${Math.max(
+            1,
+            Math.round(file.size / 1024)
+          )} KB`,
+
+          tipo: file.name
+            .split(".")
+            .pop(),
+        })),
+      }
+
+      await createProcurement(newProcurement)
+
+      toast.success("Licitação criada com sucesso!")
+
+      setFormData(INITIAL_FORM_DATA)
+
+      setAttachments([])
+
+      navigate("/ProcurementList")
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao criar licitação:",
+        error
+      )
+
+      toast.error("Erro ao criar licitação.")
+    }
   }
-
-  const handleAddAnexo = (e) => {
-    const files = Array.from(e.target.files)
-    setAnexos(prev => [...prev, ...files])
-  }
-
-  const handleRemoveAnexo = (index) => {
-    setAnexos(prev => prev.filter((_, i) => i !== index))
-  }
-
-  const handleSalvar = () => {
-    console.log("Dados:", dados)
-    console.log("Anexos:", anexos)
-  }
-
-
-   return (
-    <div className="wrapper">
+  return (
+    <div className="create-procurements-page">
       <Sidebar />
-      <main className="main">
+
+      <main className="create-procurements-main">
         <PageHeader />
-        <div className="cards-grid">
-            
-          <div className="cards-linha">
-            <CardIdentificacao dados={dados} onChange={handleChange} />
-            <CardDescricao dados={dados} onChange={handleChange} />
-          </div>
 
-          <div className="cards-linha">
-            <CardClassificacao dados={dados} onChange={handleChange} />
-            <CardFinanceiro dados={dados} onChange={handleChange} />
-            <CardDatas dados={dados} onChange={handleChange} />
-          </div>
-
-          <div className="cards-linha">
-            <CardOrigem dados={dados} onChange={handleChange} />
-            <CardAnexos
-              anexos={anexos}
-              onAdd={handleAddAnexo}
-              onRemove={handleRemoveAnexo}
-            />
-          </div>
-
+        <div className="procurement-grid">
+          <CardIdentificacao formData={formData} updateField={updateField} />
+          <CardDescricao formData={formData} updateField={updateField} />
+          <CardClassificacao formData={formData} updateField={updateField} />
+          <CardFinanceiro formData={formData} updateField={updateField} />
+          <CardDatas formData={formData} updateField={updateField} />
+          <CardOrigem formData={formData} updateField={updateField} />
+          <CardAnexos attachments={attachments} addAttachments={addAttachments} removeAttachment={removeAttachment} />
         </div>
-        <div className="rodape">
-          <Button variant="primary" onClick={handleSalvar}>
-            <i className="bi bi-floppy"></i>
+
+        <footer className="form-actions">
+          <Button variant="primary" onClick={handleSave}>
+            <Save size={22} />
             Salvar
           </Button>
-          <Button variant="segundary">
-            Cancelar
-          </Button>
-        </div>
+          <Button variant="secondary" onClick={() => navigate(-1)}>Cancelar</Button>
+        </footer>
       </main>
     </div>
-  )
+  );
 }
 
-export default CreateProcurements
+export default CreateProcurements;

@@ -1,26 +1,56 @@
-import React from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState }from "react";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Home, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Printer } from "lucide-react";
 import Sidebar from "../../components/layout/Sidebar";
 import { Card, InfoField, StatusBadge, Button, AttachmentModal } from "../../components/ui/main";
 import { getDeadlineInfo, getCurrentProcurementStatus } from "../../components/shared/procurementDeadline";
 import FormatProcurements from "../../components/shared/FormatProcurements";
-import { procurements } from "../../database/procurements";
+import { getProcurementById } from "../../services/procurementService";
+import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
 import "./DetailsProcurements.css";
 
 function DetailsProcurements() {
   const { id } = useParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const procurement = procurements.find((item) => item.id === Number(id));
+  const handleBack = () => { navigate(location.state?.from || "/dashboard");}
 
-  if (!procurement) {
-    return <p>Licitação não encontrada.</p>;
+  const [procurement, setProcurement] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function loadProcurement() {
+      try {
+        setLoading(true);
+
+        const data = await getProcurementById(id);
+
+        setProcurement(data);
+        setError("");
+      } catch (error) {
+        console.error("Erro ao buscar licitação:", error);
+        setError("Licitação não encontrada.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProcurement();
+  }, [id]);
+
+  if (loading) {
+    return <p>Carregando licitação...</p>;
   }
 
-  const tituloLicitacao = FormatProcurements(procurement);
-  const anexos = procurement.anexos ?? [];
+  if (error || !procurement) {
+    return <p>{error || "Licitação não encontrada."}</p>;
+  }
 
+  const tituloLicitacao = `${getOptionLabel(PROCUREMENT_TYPES, procurement.tipo)} nº ${procurement.numero}/${procurement.ano}`;
+
+  const anexos = procurement.anexos ?? [];
   const currentStatus = getCurrentProcurementStatus(procurement);
   const deadlineInfo = getDeadlineInfo(procurement);
 
@@ -31,7 +61,11 @@ function DetailsProcurements() {
       <main className="procurement-main">
         <header className="page-header">
           <div className="page-title-group">
-            <button type="button" className="back-button" onClick={() => navigate(-1)}>
+            <button
+              type="button"
+              className="back-button"
+              onClick={handleBack}
+            >
               <ArrowLeft size={26} />
             </button>
 
@@ -57,17 +91,16 @@ function DetailsProcurements() {
 
             <div className="details-actions">
               <AttachmentModal anexos={anexos} />
-              
-              <Link to={`/procurements/edit/${id}`}>
-                <Button variant="secondary" className="btn">
+
+              <Link to={`/procurements/edit/${id}`}
+                    state={{from: location.state?.from || "/procurements"}}>
+                <Button variant="secondary" className="btn-action btn-edit">
                   <Pencil size={24} className="btn-icon" />
-                  Editar
                 </Button>
               </Link>
 
-              <Button variant="primary" className="btn">
+              <Button variant="primary" className="btn-action btn-print">
                 <Printer size={24} />
-                Imprimir
               </Button>
             </div>
           </div>
@@ -79,67 +112,35 @@ function DetailsProcurements() {
                 <InfoField label="Ano:" value={procurement.ano} plain />
               </div>
 
-              <InfoField label="Tipo de Licitação:" value={procurement.tipo} />
-
+              <InfoField label="Tipo de Licitação:" value={getOptionLabel(PROCUREMENT_TYPES, procurement.tipo)} />
               <StatusBadge status={currentStatus} />
             </Card>
 
             <Card title="Descrição" icon={Pencil} className="span-5">
               <InfoField label="Objeto:" value={procurement.objeto} />
-              <InfoField
-                label="Descrição do Objeto:"
-                value={procurement.descricao}
-              />
+              <InfoField label="Descrição do Objeto:" value={procurement.descricao} />
             </Card>
 
             <Card title="Datas" icon={CalendarDays} className="span-4">
-              <InfoField
-                label="Data de Publicação:"
-                value={procurement.publicacao}
-              />
-              <InfoField
-                label="Data de Abertura:"
-                value={procurement.abertura}
-              />
+              <InfoField label="Data de Publicação:" value={procurement.publicacao} />
+              <InfoField label="Data de Abertura:" value={procurement.abertura} />
             </Card>
 
-            <Card
-              title="Classificação"
-              icon={FolderOpen}
-              className="span-3 compact-card"
-            >
+            <Card title="Classificação" icon={FolderOpen} className="span-3 compact-card">
               <div className="compact-card-content">
-                <InfoField
-                  label="Classificação:"
-                  value={procurement.classificacao}
-                />
+                <InfoField label="Classificação:" value={procurement.classificacao} />
               </div>
             </Card>
 
-            <Card
-              title="Financeiro"
-              icon={CircleDollarSign}
-              className="span-3 compact-card"
-            >
+            <Card title="Financeiro" icon={CircleDollarSign} className="span-3 compact-card">
               <div className="compact-card-content">
-                <InfoField
-                  label="Valor Estimado:"
-                  value={procurement.valorEstimado}
-                />
+                <InfoField label="Valor Estimado:" value={procurement.valorEstimado} />
               </div>
             </Card>
 
-            <Card
-              title="Origem"
-              icon={Landmark}
-              className="span-3 compact-card"
-            >
+            <Card title="Origem" icon={Landmark} className="span-3 compact-card">
               <div className="compact-card-content">
-                <InfoField
-                  label="Secretaria Responsável:"
-                  value={procurement.secretaria}
-                  muted
-                />
+                <InfoField label="Secretaria Responsável:" value={procurement.secretaria} muted />
               </div>
             </Card>
 
@@ -152,13 +153,8 @@ function DetailsProcurements() {
                 <span className="countdown-label">{deadlineInfo.label}</span>
 
                 <div className="countdown-line">
-                  <strong className="countdown-days">
-                    {deadlineInfo.value}
-                  </strong>
-
-                  <span className="countdown-text">
-                    {deadlineInfo.description}
-                  </span>
+                  <strong className="countdown-days">{deadlineInfo.value}</strong>
+                  <span className="countdown-text">{deadlineInfo.description}</span>
                 </div>
               </div>
             </Card>

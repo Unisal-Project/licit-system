@@ -1,0 +1,573 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.create-procurements-page {
+  min-height: 100vh;
+  display: flex;
+  overflow-y: visible;
+  background: var(--bg-light, #f6f7fb);
+  font-family: "Poppins", sans-serif;
+}
+
+.create-procurements-main {
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+  margin-left: 170px;
+  padding: 28px 34px 80px;
+}
+
+/* HEADER */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: rgba(37, 99, 235, 0.14);
+  color: var(--secondary, #2563eb);
+  text-decoration: none;
+}
+
+.page-header h1 {
+  margin: 0 0 7px;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+}
+
+.page-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary, #8b95a7);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-secondary, #9ca3af);
+  white-space: nowrap;
+}
+
+.breadcrumb strong {
+  color: var(--secondary, #2563eb);
+  font-weight: 700;
+}
+
+/* GRID */
+
+.procurement-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.7fr 1.4fr;
+  grid-auto-rows: minmax(156px, auto);
+  gap: 14px;
+}
+
+.card-identificacao {
+  grid-column: 1 / 2;
+}
+
+.card-descricao {
+  grid-column: 2 / 4;
+}
+
+.card-classificacao {
+  grid-column: 1 / 2;
+}
+
+.card-financeiro {
+  grid-column: 2 / 3;
+}
+
+.card-datas {
+  grid-column: 3 / 4;
+}
+
+.card-origem {
+  grid-column: 1 / 2;
+}
+
+.card-anexos-wrapper {
+  grid-column: 2 / 4;
+}
+
+/* CARDS */
+
+.form-card {
+  min-width: 0;
+  padding: 22px 22px 20px;
+  border-radius: 22px;
+  background: var(--bg, #ffffff);
+  border: 1px solid rgba(226, 232, 240, 0.75);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.form-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  color: var(--secondary, #2563eb);
+}
+
+.form-card-header h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+}
+
+.form-card-header p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.form-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+/* FIELDS */
+
+.field-row {
+  display: flex;
+  gap: 14px;
+}
+
+.two-columns > .field,
+.two-columns > .edit-field,
+.two-columns > .create-field {
+  flex: 1;
+}
+
+.field,
+.edit-field,
+.create-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+}
+
+.field-small {
+  max-width: 145px;
+}
+
+.field label,
+.edit-field span,
+.create-field span {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+}
+
+
+/* INPUTS */
+
+.field input:not([type="date"]),
+.form-control,
+.edit-field textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1.5px solid var(--text-secondary);
+  border-radius: 10px;
+  outline: none;
+  background: var(--bg, #ffffff);
+  color: var(--text-primary, #1f2937);
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+}
+
+.edit-field .input-container {
+  width: 100%;
+  min-height: 42px;
+  border: 1.5px solid var(--text-secondary);
+  border-radius: 10px;
+  background: var(--bg, #ffffff);
+}
+
+.edit-field .input-container input {
+  border: none;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.field input:not([type="date"]):focus,
+.form-control:focus,
+.edit-field textarea:focus,
+.edit-field .input-container:focus-within,
+.date-input-container:focus-within {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.field input::placeholder,
+.edit-field input::placeholder,
+.edit-field textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+.edit-field textarea {
+  min-height: 90px;
+  padding: 11px 12px;
+  resize: vertical;
+}
+
+/*Date*/
+
+.date-input-container {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid var(--text-secondary);
+  border-radius: 10px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.date-input-container:focus-within {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.date-icon-button {
+  width: 44px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.date-icon-button:hover {
+  color: var(--secondary);
+}
+
+.date-input-container input {
+  flex: 1;
+  height: 100%;
+  padding: 0 12px;
+  background: transparent;
+  font-family: "Poppins", sans-serif;
+}
+
+.date-input-container input,
+.date-input-container input:focus {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.date-input-container input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+
+/* REACT SELECT */
+
+.create-react-select__control {
+  min-height: 42px;
+  border-radius: 10px;
+  border-color: var(--text-secondary);
+  background: var(--bg);
+  box-shadow: none;
+}
+
+.create-react-select__control--is-focused {
+  border-color: var(--secondary);
+}
+
+.create-react-select__placeholder {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.create-react-select__single-value {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.create-react-select__menu-portal {
+  z-index: 9999;
+}
+
+.tipo-licitacao-select {
+  width: 100%;
+  min-width: 315px;
+}
+
+/* ANEXOS */
+
+.attachments-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  align-items: start;
+  gap: 22px;
+}
+
+.upload-area {
+  min-height: 126px;
+  border: 1.8px dashed #9aa5b5;
+  border-radius: 22px;
+  background: #fafbfe;
+  color: var(--text-primary, #1f2937);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.upload-area:hover {
+  border-color: var(--secondary, #2563eb);
+  background: #f4f8ff;
+}
+
+.upload-area svg,
+.attachment-info svg,
+.excel-button svg {
+  color: var(--secondary, #2563eb);
+}
+
+.upload-area strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.upload-area span {
+  color: var(--secondary, #2563eb);
+}
+
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.attachments-list > p {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+}
+
+.attachments-scroll {
+  max-height: 92px;
+  overflow-y: auto;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachments-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.attachments-scroll::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 999px;
+}
+
+.attachments-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.empty-attachments {
+  font-size: 12px;
+  color: var(--text-secondary, #8b95a7);
+}
+
+.attachment-item {
+  min-height: 42px;
+  padding: 8px 11px;
+  border: 1.3px solid #b9c0cc;
+  border-radius: 12px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.attachment-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.attachment-info svg {
+  flex: 0 0 auto;
+}
+
+.attachment-info p {
+  max-width: 170px;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+}
+
+.attachment-info span {
+  display: block;
+  font-size: 9px;
+  color: var(--text-secondary, #8b95a7);
+}
+
+.remove-attachment {
+  border: none;
+  background: transparent;
+  color: var(--danger, #ef4444);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.back-button-create {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  border: 1px solid var(--secondary);
+  background: #e5e7eb;
+  color: var(--secondary);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  transition: 0.2s ease;
+  flex-shrink: 0;
+}
+
+.back-button-create:hover {
+  background: #dbe1e8;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.form-actions button {
+  min-width: 220px;
+  min-height: 54px;
+  border-radius: 14px;
+  font-size: 23px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 1100px) {
+  .create-procurements-main {
+    margin-left: 0;
+    padding: 24px 20px 80px;
+  }
+
+  .procurement-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-identificacao,
+  .card-descricao,
+  .card-classificacao,
+  .card-financeiro,
+  .card-datas,
+  .card-origem,
+  .card-anexos-wrapper {
+    grid-column: 1;
+  }
+
+  .attachments-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tipo-licitacao-select {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .breadcrumb {
+    white-space: normal;
+  }
+
+  .field-row {
+    flex-direction: column;
+  }
+
+  .field-small {
+    max-width: none;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}

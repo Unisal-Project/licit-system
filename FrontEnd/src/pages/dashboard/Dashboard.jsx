@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react"
 import Sidebar from "../../components/layout/Sidebar"
-import { getLatestProcurements, getProcurementsChartData, getTotalProcurements, countProcurementsByStatus } from "../../services/procurementService"
-import PageHeader from "../../components/ui/DashboardComponents/PageHeader"
-import CardStats from "../../components/ui/DashboardComponents/CardStats"
-import ProcurementTable from "../../components/ui/DashboardComponents/ProcurementTable"
-import ChartCard from "../../components/ui/DashboardComponents/ChartCard"
-import FooterBar from "../../components/ui/DashboardComponents/FooterBar"
-import InfoCard from "../../components/ui/DashboardComponents/InfoCard";
+import { PageHeader, CardStats, ProcurementTable, ChartCard, InfoCard, FooterBar } from "../../components/ui/main"
 import { FolderOpen, ClockAlert } from "lucide-react"
+import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
+import { getAllProcurements, getLatestProcurements, getProcurementsChartData, getTotalProcurements, countProcurementsByStatus, updateOpeningStatuses } from "../../services/procurementService"
 import "./Dashboard.css"
 
 function Dashboard() {
@@ -18,64 +14,73 @@ function Dashboard() {
   const [totalProcurements, setTotalProcurements] = useState(0)
 
   useEffect(() => {
-    try {
-      setSummary(countProcurementsByStatus())
-      setTotalProcurements(getTotalProcurements())
-      setChartData(getProcurementsChartData())
-      setLatestProcurements(getLatestProcurements(5))
-    } catch (error) {
-      console.error("Erro ao carregar dados do dashboard:", error)
+    async function loadDashboardData() {
+      try {
+        setLoading(true)
 
-      setSummary({})
-      setTotalProcurements(0)
-      setChartData([])
-      setLatestProcurements([])
-    } finally {
-      setLoading(false)
+        const procurements = await getAllProcurements()
+        const updatedProcurements = await updateOpeningStatuses(procurements)
+
+        setSummary(countProcurementsByStatus(updatedProcurements))
+        setTotalProcurements(getTotalProcurements(updatedProcurements))
+        setChartData(getProcurementsChartData(updatedProcurements))
+        setLatestProcurements(getLatestProcurements(updatedProcurements, 5))
+      } catch (error) {
+        console.error("Erro ao carregar dados do dashboard:", error)
+
+        setSummary({})
+        setTotalProcurements(0)
+        setChartData([])
+        setLatestProcurements([])
+      } finally {
+        setLoading(false)
+      }
     }
+
+    loadDashboardData()
   }, [])
 
   return (
-      <div className="wrapper">
-        <Sidebar />
+    <div className="wrapper">
+      <Sidebar />
 
-        <main className="main">
-          <PageHeader />
+      <main className="main">
+        <PageHeader />
 
-          <CardStats summary={summary} loading={loading} />
+        <CardStats summary={summary} loading={loading} />
 
-          <div className="meio-row">
-            <ProcurementTable
-                procurements={latestProcurements}
+        <div className="meio-row">
+          <ProcurementTable
+            procurements={latestProcurements}
+            loading={loading}
+          />
+
+          <div className="dashboard-lateral">
+            <ChartCard chartData={chartData} loading={loading} />
+
+            <div className="cards-total-row">
+              <InfoCard
+                label="Total de Licitações"
+                value={totalProcurements}
                 loading={loading}
-            />
+                icon={FolderOpen}
+              />
 
-            <div className="dashboard-lateral">
-              <ChartCard chartData={chartData} loading={loading} />
-
-              <div className="cards-total-row">
-                <InfoCard
-                    label="Total de Licitações"
-                    value={totalProcurements}
-                    loading={loading}
-                    icon={FolderOpen}
-                />
-
-                <InfoCard
-                    label="Aguardando Abertura"
-                    value={summary?.aguardandoAbertura ?? 0}
-                    loading={loading}
-                    icon={ClockAlert}
-                    iconClass="card-aguardando-icon"
-                    valueClass="card-aguardando-valor"
-                />
-              </div>
+              <InfoCard
+                label="Aguardando Abertura"
+                value={summary?.aguardandoAbertura ?? 0}
+                loading={loading}
+                icon={ClockAlert}
+                iconClass="card-aguardando-icon"
+                valueClass="card-aguardando-valor"
+              />
             </div>
           </div>
+        </div>
 
-          <FooterBar/>
-        </main>
-      </div>
+        <FooterBar />
+      </main>
+    </div>
   )
 }
 

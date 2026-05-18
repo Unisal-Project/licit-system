@@ -2,6 +2,15 @@ import { parseBrazilianDate, getTodayAtMidday} from "../../utils/dateUtils.js"
 
 const WAITING_STATUS = "AGUARDANDO ABERTURA";
 
+function normalizeStatus(status) {
+  return String(status || "")
+    .replace(/_/g, " ")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .trim();
+}
+
 function calculateDaysUntil(openingDateString) {
   const openingDate = parseBrazilianDate(openingDateString);
 
@@ -20,7 +29,7 @@ function formatDays(days) {
 }
 
 export function getCurrentProcurementStatus(procurement) {
-  const status = procurement.status?.toUpperCase();
+  const status = normalizeStatus(procurement.status);
   const daysUntilOpening = calculateDaysUntil(procurement.abertura);
 
   if (status === WAITING_STATUS && daysUntilOpening <= 0) {
@@ -38,7 +47,7 @@ export function getDeadlineInfo(procurement) {
     return {
       type: "neutral",
       label: "Prazo indisponível",
-      value: "Data inválida",
+      value: "data_inválida",
       description: "Verifique a data de abertura",
     };
   }

@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Login from "../pages/auth/Login";
 
@@ -28,7 +30,18 @@ function AppRoutes() {
                 <Route path="/remote-access" element={<RemoteAccess />} />
 
                 <Route path="*" element={<Navigate to="/procurements" replace />} />
+
             </Routes>
+            
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                pauseOnHover
+                theme="light"
+            />
         </BrowserRouter>
     );
 }

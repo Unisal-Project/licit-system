@@ -1,17 +1,43 @@
 import React, { useEffect, useState, useRef } from "react";
 import Sidebar from "../../components/layout/Sidebar";
+import { Search, Funnel, PlusCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import "./ProcurementList.css";
 import { useNavigate } from "react-router-dom";
 import { Button, Input } from "../../components/ui/main.js";
-import { procurements } from "../../database/procurements.js";
 import { statusOptions, tipoOptions, origemOptions, filterProcurements, paginateItems, getStatusColor } from "../../components/shared/procurementListUtils.js";
 import { getCurrentProcurementStatus } from "../../components/shared/procurementDeadline.js"
+import { getAllProcurements } from "../../services/procurementService.js";
+import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
 
 function ProcurementList() {
     const navigate = useNavigate();
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        async function loadProcurements() {
+
+            try {
+
+                const procurements =
+                    await getAllProcurements()
+
+                setData(procurements)
+
+            } catch (error) {
+
+                console.error(
+                    "Erro ao carregar licitações:",
+                    error
+                )
+            }
+        }
+
+        loadProcurements()
+
+    }, [])
 
     const irParaSelecao = () => {
-        navigate("/CreateProcurements");
+        navigate("/procurements/create");
     };
 
     const [showFilter, setShowFilter] = useState(false);
@@ -63,11 +89,37 @@ function ProcurementList() {
         tipo: selectedTipo,
         origem: selectedOrigem,
     };
+    
+    const [searchTerm, setSearchTerm] = useState("");
 
     const filteredProcurements = filterProcurements(
-        procurements,
-        filters
-    );
+    data,
+    filters
+    ).filter((procurement) => {
+
+        const search = searchTerm.toLowerCase();
+
+        const tipoLabel = getOptionLabel(
+            PROCUREMENT_TYPES,
+            procurement.tipo
+        ).toLowerCase();
+
+        return (
+            `${procurement.numero}/${procurement.ano}`
+                .toLowerCase()
+                .includes(search) ||
+
+            tipoLabel.includes(search) ||
+
+            procurement.origem
+                ?.toLowerCase()
+                .includes(search) ||
+
+            procurement.objeto
+                ?.toLowerCase()
+                .includes(search)
+        );
+    });
 
     const { totalPages, currentItems } = paginateItems(
         filteredProcurements,
@@ -95,6 +147,7 @@ function ProcurementList() {
         };
     }, []);
 
+
     return (
         <div className="page">
             <Sidebar/>
@@ -103,8 +156,10 @@ function ProcurementList() {
                 <div className="top-bar">
                     <Input
                         placeholder="Buscar..."
-                        icon="bi bi-search"
+                        icon={Search}
                         className="input-search"
+                        value={searchTerm}
+                        onChange={(event) => setSearchTerm(event.target.value)}
                     />
 
                     <div className="filter-container" ref={dropdownRef}>
@@ -114,7 +169,7 @@ function ProcurementList() {
                             }`}
                             onClick={() => setShowFilter(!showFilter)}
                         >
-                            <i className="bi bi-funnel-fill"></i>
+                            <Funnel size={80} />
                         </button>
 
                         {showFilter && (
@@ -129,17 +184,17 @@ function ProcurementList() {
                                                 className={`filter-pill status-pill ${
                                                     status.extraClass || ""
                                                 } ${
-                                                    selectedStatus === status.label ? "active" : ""
+                                                    selectedStatus === status.value ? "active" : ""
                                                 }`}
                                                 onClick={() =>
                                                     toggleFilter(
                                                         selectedStatus,
-                                                        status.label,
+                                                        status.value,
                                                         setSelectedStatus
                                                     )
                                                 }
                                             >
-                                                <span>{status.label}</span>
+                                                <span>{status.value}</span>
                                                 <span
                                                     className={`status-dot ${status.dotClass}`}
                                                 ></span>
@@ -212,8 +267,8 @@ function ProcurementList() {
                         className="btn-New"
                         variant="primary"
                         onClick={irParaSelecao}
-                        icon="bi bi-plus-circle-fill"
                     >
+                        <PlusCircle size={18} />
                         Nova Licitação
                     </Button>
                 </div>
@@ -229,7 +284,7 @@ function ProcurementList() {
                             onClick={() => setCurrentPage(currentPage - 1)}
                             disabled={currentPage === 1}
                         >
-                            <i className="bi bi-caret-left-fill"></i>
+                            <ChevronLeft size={18} />
                         </button>
 
                         <button
@@ -237,7 +292,7 @@ function ProcurementList() {
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage === totalPages}
                         >
-                            <i className="bi bi-caret-right-fill"></i>
+                            <ChevronRight size={18} />
                         </button>
                     </div>
                 </div>
@@ -266,11 +321,13 @@ function ProcurementList() {
                                         key={item.id}
                                         className="table-row-clickable"
                                         onClick={() =>
-                                            navigate(`/procurements/${item.id}`)
+                                            navigate(`/procurements/${item.id}`, {
+                                                state: { from: "/procurements" },
+                                            })
                                         }
                                     >
                                         <td>{item.numero}/{item.ano}</td>
-                                        <td>{item.tipo}</td>
+                                        <td>{getOptionLabel(PROCUREMENT_TYPES, item.tipo)}</td>
                                         <td>{item.origem}</td>
                                         <td>{item.publicacao}</td>
                                         <td>{item.abertura}</td>

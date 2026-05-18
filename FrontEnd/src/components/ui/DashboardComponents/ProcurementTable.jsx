@@ -8,7 +8,7 @@ function ProcurementTable({ procurements = [], loading }) {
 
     return (
         <div className="card tabela-card">
-            <h3 className="tabela-titulo">Últimas Licitações</h3>
+            <h3 className="tabela-titulo">Últimas Modificações</h3>
 
             <table className="tabela">
                 <thead>
@@ -45,7 +45,7 @@ function ProcurementTable({ procurements = [], loading }) {
                             <tr
                                 key={procurement.id}
                                 className="linha-dados linha-clicavel"
-                                onClick={() => navigate(`/procurements/${procurement.id}`)}
+                                onClick={() => navigate(`/procurements/${procurement.id}`,{state: { from: "/dashboard"},})}
                             >
                                 <td>{formatProcurementNumber(procurement)}</td>
                                 <td>{getProcurementOrigin(procurement)}</td>

@@ -126,42 +126,24 @@ body {
   flex-shrink: 0;
 }
 
-.btn {
-  min-width: 200px;
-  height: 72px;
+.btn-action {
+  width: 64px;
+  min-width: 64px;
+  height: 54px;
 
-  border-radius: 13px;
-  border: 1px solid transparent;
+  padding: 0;
+
+  border-radius: 14px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
 
-  font-size: 15px;
-  font-weight: 700;
-
-  cursor: pointer;
   transition: 0.2s ease;
 }
 
-.btn-outline {
-  background: var(--bg);
-  border-color: var(--bg-dark);
-  color: var(--text-primary);
-}
-
-.btn-outline:hover {
-  background: #f3f4f6;
-}
-
-.btn-primary {
-  background: var(--secondary);
-  color: var(--bg);
-}
-
-.btn-primary:hover {
-  background: var(--primary);
+.btn-action svg {
+  flex-shrink: 0;
 }
 
 .cards-grid {
@@ -266,8 +248,13 @@ body {
 
 @media (max-width: 1440px) {
   .procurement-main {
-    padding: 24px 28px;
-    margin-top: 15px;
+    min-height: 100vh;
+    margin-top: -10px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding-bottom: 120px;
   }
 
   .page-header {
@@ -290,7 +277,7 @@ body {
   }
 
   .details-container {
-    margin-top: -10px;
+    margin-top: -12px;
     max-width: 100%;
     min-height: auto;
 
@@ -298,6 +285,7 @@ body {
     border-radius: 16px;
 
     box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
+    
   }
 
   .details-top {

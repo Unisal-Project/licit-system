@@ -148,6 +148,7 @@
     border-radius: 16px;
 
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--text-secondary);
 }
 
 .tabela-card {
@@ -165,11 +166,13 @@
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: -8px;
+    margin-left: 10px;
+    margin-top: 12px;
 }
 
 .tabela {
-    width: calc(100% + 40px);
-    margin-left: -20px;
+    margin-top: 15px;
+    width: 100%;
     border-collapse: collapse;
     font-size: 12px;
 }
@@ -228,7 +231,6 @@
 .tabela-rodape {
     display: flex;
     justify-content: center;
-    margin-top: -10px;
 }
 
 .btn-ver-todas {
