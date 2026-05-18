@@ -95,7 +95,7 @@ function Login() {
                         </Button>
 
                         <p className='register-text'>
-                            Não possui uma conta? <a href='#'>Cadastre-se</a>
+                            Não possui uma conta? <NavLink to="/register">Cadastre-se</NavLink>
                         </p>
                     </form>
                 </div>

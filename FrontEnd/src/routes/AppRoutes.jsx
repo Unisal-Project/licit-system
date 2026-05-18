@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register.jsx";
 
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 
@@ -12,6 +13,7 @@ import EditProcurements from "../pages/procurements/EditProcurements.jsx";
 import DetailsProcurements from "../pages/procurements/DetailsProcurements.jsx";
 
 import RemoteAccess from "../pages/remote-access/RemoteAccess.jsx";
+import Settings from "../pages/settings/Settings.jsx";
 
 function AppRoutes() {
     return (
@@ -20,6 +22,7 @@ function AppRoutes() {
                 <Route path="/" element={<Navigate to="/login" replace />} />
 
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={<Dashboard />} />
 
                 <Route path="/procurements" element={<ProcurementList />} />
@@ -28,6 +31,7 @@ function AppRoutes() {
                 <Route path="/procurements/:id" element={<DetailsProcurements />} />
 
                 <Route path="/remote-access" element={<RemoteAccess />} />
+                <Route path="/settings" element={<Settings />} />
 
                 <Route path="*" element={<Navigate to="/procurements" replace />} />
 

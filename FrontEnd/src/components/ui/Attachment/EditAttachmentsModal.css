@@ -51,16 +51,19 @@
 }
 
 .attachments-files::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .attachments-files::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--scrollbar-track);
+  border-radius: 999px;
 }
 
 .attachments-files::-webkit-scrollbar-thumb {
-  background: var(--bg-dark);
+  background: var(--scrollbar-thumb);
+  border: 2px solid transparent;
   border-radius: 999px;
+  background-clip: padding-box;
 }
 
 .attachments-file-item {
