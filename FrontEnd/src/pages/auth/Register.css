@@ -44,7 +44,7 @@
 }
 
 .register-logo p {
-  margin: -18px 0 0 94px;
+  margin: -8px 0 0 0;
   color: #7b8494;
   font-size: 12px;
 }
@@ -225,7 +225,7 @@
 .register-deco-text h2 {
   margin: 0 0 10px;
   color: #dfe8ff;
-  font-size: 36px;
+  font-size: 32px;
   line-height: 1.16;
   font-weight: 600;
 }
@@ -294,28 +294,10 @@
   }
 
   .register-deco-text h2 {
-    font-size: 26px;
+    font-size: 22px;
   }
 
   .register-deco-text p {
-    font-size: 17px;
-  }
-}
-
-@media (max-width: 900px) {
-  .register-panel-left {
-    width: 100%;
-    min-height: 100vh;
-    padding: 28px 22px;
-  }
-
-  .register-panel-deco {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .register-fields-row {
-    grid-template-columns: 1fr;
+    font-size: 14px;
   }
 }
