@@ -50,10 +50,12 @@ def save_bidding_attachment(bidding_id: int, file: UploadFile):
 
         file_size_kb = os.path.getsize(normalized_path) // 1024
 
+        relative_path = f"licitacoes/{bidding_id}/{unique_name}"
+
         attachment_data = {
             "licitacao_id": bidding_id,
             "nome": file.filename,
-            "caminho": normalized_path,
+            "caminho": relative_path,
             "tipo": file_ext.replace(".", ""),
             "categoria": "documento",
             "tamanho_kb": file_size_kb

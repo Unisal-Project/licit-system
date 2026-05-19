@@ -2,17 +2,17 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class GetAllBiddings(BaseModel):
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    number: Optional[int] = None,
-    year: Optional[int] = None,
-    department_id: Optional[int] = None,
-    category_id: Optional[int] = None,
-    status: Optional[str] = None,
+    page: int = Field(1, ge=1)
+    limit: int = Field(10, ge=1, le=100)
+    number: Optional[int] = None
+    year: Optional[int] = None
+    department_id: Optional[int] = None
+    category_id: Optional[int] = None
+    status: Optional[str] = None
     search: Optional[str] = None
 
 class BiddingCreate(BaseModel):

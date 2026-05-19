@@ -5,10 +5,8 @@ from fastapi import HTTPException
 from app.core.database import get_connection, close_resources
 from app.repository import bidding as bidding_repo
 from app.repository import attachment as attachment_repo
-from app.schema.bidding import BiddingCreate, BiddingUpdate
+from app.schema.bidding import BiddingCreate, BiddingUpdate, GetAllBiddings
 from app.utils.pagination import get_pagination
-
-from BackEnd.app.schema.bidding import GetAllBiddings
 
 AUTOMATIC_STATUSES = {"Aguardando Abertura", "Aberto", None, ""}
 

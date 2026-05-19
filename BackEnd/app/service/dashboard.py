@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from app.core.database import get_connection
+from app.core.database import get_connection, close_resources
 from app.repository import dashboard as dashboard_repository
 
 
@@ -22,11 +22,7 @@ def get_dashboard_summary():
         )
 
     finally:
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_resources(cursor, connection)
 
 
 def get_latest_biddings():
@@ -47,8 +43,4 @@ def get_latest_biddings():
         )
 
     finally:
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_resources(cursor, connection)

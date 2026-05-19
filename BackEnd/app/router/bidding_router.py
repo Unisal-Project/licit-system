@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Query
 from typing import Optional
-from app.schema.bidding import BiddingCreate, BiddingUpdate
+from app.schema.bidding import BiddingCreate, BiddingUpdate, GetAllBiddings
 from app.service import bidding as bidding_service
 
 
@@ -10,7 +10,26 @@ router = APIRouter(
 )
 
 @router.get("/")
-def get_all_biddings(data: GetAllBiddings):
+def get_all_biddings(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    number: Optional[int] = Query(None),
+    year: Optional[int] = Query(None),
+    department_id: Optional[int] = Query(None),
+    category_id: Optional[int] = Query(None),
+    status: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+):
+    data = GetAllBiddings(
+        page=page,
+        limit=limit,
+        number=number,
+        year=year,
+        department_id=department_id,
+        category_id=category_id,
+        status=status,
+        search=search
+    )
     return bidding_service.list_all_biddings(data)
 
 @router.get("/{bidding_id}")
