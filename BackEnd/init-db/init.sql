@@ -114,7 +114,7 @@ CREATE TABLE `licitacoes` (
                               `criado_em`        datetime       DEFAULT CURRENT_TIMESTAMP,
                               `atualizado_em`    datetime       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                               PRIMARY KEY (`id`),
-                              UNIQUE KEY `uk_numero_ano` (`numero`,`ano`),
+                              UNIQUE KEY `uk_numero_ano_tipo` (`numero`,`ano`,`tipo`),
                               KEY `usuario_id`    (`usuario_id`),
                               KEY `secretaria_id` (`secretaria_id`),
                               KEY `categoria_id`  (`categoria_id`),

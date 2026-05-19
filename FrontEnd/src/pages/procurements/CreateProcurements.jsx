@@ -661,6 +661,26 @@ const getSelectedSecretaria = (value, secretariaOptions = SECRETARIAS) => {
   );
 };
 
+const REQUIRED_CREATE_FIELDS = [
+  ["numero", "Número"],
+  ["ano", "Ano"],
+  ["tipo", "Tipo de Licitação"],
+  ["objeto", "Objeto"],
+  ["classificacao", "Classificação"],
+  ["valorEstimado", "Valor Estimado"],
+  ["dataPublicacao", "Data de Publicação"],
+  ["dataAbertura", "Data de Abertura"],
+  ["secretaria", "Secretaria Responsável"],
+];
+
+const getMissingRequiredField = (formData) => {
+  return REQUIRED_CREATE_FIELDS.find(([fieldName]) => {
+    const value = formData[fieldName];
+
+    return value === null || value === undefined || String(value).trim() === "";
+  });
+};
+
 function CreateProcurements() {
 
   const navigate = useNavigate();
@@ -703,6 +723,13 @@ function CreateProcurements() {
   const handleSave = async () => {
 
     try {
+      const missingField = getMissingRequiredField(formData);
+
+      if (missingField) {
+        toast.error(`Preencha o campo ${missingField[1]}.`);
+        return;
+      }
+
       setSaving(true);
 
       const selectedSecretaria =

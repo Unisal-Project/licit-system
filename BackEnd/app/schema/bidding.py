@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class GetAllBiddings(BaseModel):
@@ -20,20 +20,28 @@ class BiddingCreate(BaseModel):
     department_id: int
     category_id: int
 
-    number: int
-    year: int
+    number: int = Field(..., gt=0)
+    year: int = Field(..., gt=0)
 
-    bidding_type: str
+    bidding_type: str = Field(..., min_length=1)
     status: Optional[str] = "Aguardando Abertura"
-    classification: Optional[str] = "Global"
+    classification: str = Field(..., min_length=1)
 
-    object_name: str
+    object_name: str = Field(..., min_length=1)
     object_description: Optional[str] = None
 
-    estimated_value: Optional[Decimal] = None
+    estimated_value: Decimal
 
-    publication_date: Optional[date] = None
-    opening_date: Optional[date] = None
+    publication_date: date
+    opening_date: date
+
+    @field_validator("bidding_type", "classification", "object_name")
+    @classmethod
+    def required_text_fields_must_not_be_blank(cls, value: str):
+        if not value or not value.strip():
+            raise ValueError("Campo obrigatório.")
+
+        return value.strip()
 
 
 class BiddingUpdate(BaseModel):

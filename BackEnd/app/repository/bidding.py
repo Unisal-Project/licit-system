@@ -17,6 +17,35 @@ def ensure_status_enum_supports_waiting(cursor):
     )
 
 
+def ensure_unique_constraint_includes_type(cursor):
+    cursor.execute(
+        """
+        SELECT INDEX_NAME, GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS columns
+        FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'licitacoes'
+          AND NON_UNIQUE = 0
+        GROUP BY INDEX_NAME
+        """
+    )
+
+    unique_indexes = {
+        row["INDEX_NAME"]: row["columns"]
+        for row in cursor.fetchall()
+    }
+
+    if unique_indexes.get("uk_numero_ano") == "numero,ano":
+        cursor.execute("ALTER TABLE licitacoes DROP INDEX uk_numero_ano")
+
+    if unique_indexes.get("uk_numero_ano_tipo") != "numero,ano,tipo":
+        cursor.execute(
+            """
+            ALTER TABLE licitacoes
+            ADD UNIQUE KEY uk_numero_ano_tipo (numero, ano, tipo)
+            """
+        )
+
+
 def ensure_user_exists(user_id: int, cursor):
     cursor.execute("SELECT id FROM usuarios WHERE id = %s", (user_id,))
     if cursor.fetchone():

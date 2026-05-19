@@ -2,6 +2,7 @@ import os
 import shutil
 from datetime import date
 from fastapi import HTTPException
+from mysql.connector import Error
 from app.core.database import get_connection, close_resources
 from app.repository import bidding as bidding_repo
 from app.repository import attachment as attachment_repo
@@ -19,6 +20,15 @@ def _get_date_based_status(opening_date, current_status=None):
         return "Aguardando Abertura"
 
     return "Aberto"
+
+
+def _raise_duplicate_bidding_error(error):
+    if isinstance(error, Error) and error.errno == 1062:
+        raise HTTPException(
+            status_code=409,
+            detail="Já existe uma licitação com este número, ano e tipo."
+        )
+
 
 def list_all_biddings(data: GetAllBiddings):
 
@@ -81,6 +91,7 @@ def create_new_bidding(data: BiddingCreate):
     cursor = connection.cursor(dictionary=True)
     try:
         bidding_repo.ensure_status_enum_supports_waiting(cursor)
+        bidding_repo.ensure_unique_constraint_includes_type(cursor)
 
         bidding_repo.ensure_user_exists(data.user_id, cursor)
 
@@ -93,6 +104,7 @@ def create_new_bidding(data: BiddingCreate):
 
     except Exception as e:
         if connection: connection.rollback()
+        _raise_duplicate_bidding_error(e)
         raise HTTPException(status_code=500, detail=str(e))
 
     finally:
@@ -106,6 +118,7 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
     cursor = connection.cursor(dictionary=True)
     try:
         bidding_repo.ensure_status_enum_supports_waiting(cursor)
+        bidding_repo.ensure_unique_constraint_includes_type(cursor)
         bidding = bidding_repo.find_by_id(bidding_id, cursor)
         if not bidding:
             raise HTTPException(status_code=404, detail="Bidding not found")
@@ -153,6 +166,7 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
     except Exception as e:
         if connection:
             connection.rollback()
+        _raise_duplicate_bidding_error(e)
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         close_resources(cursor, connection)
