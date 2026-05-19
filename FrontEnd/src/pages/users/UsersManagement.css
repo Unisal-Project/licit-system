@@ -1,0 +1,296 @@
+.users-page {
+  min-height: 100vh;
+  background: var(--bg-light);
+  font-family: "Poppins", sans-serif;
+}
+
+.users-main {
+  min-height: 100vh;
+  margin-left: 190px;
+  padding: 32px 42px 48px;
+}
+
+.users-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.users-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.users-header h1 {
+  margin: 0 0 6px;
+  color: var(--text-primary);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.users-header p,
+.users-breadcrumb {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.users-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.users-breadcrumb strong {
+  color: var(--secondary);
+}
+
+.users-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.users-summary-card,
+.users-session-card,
+.users-card {
+  background: var(--bg);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  border-radius: 18px;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.users-summary-card {
+  min-height: 104px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.summary-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--secondary);
+  display: grid;
+  place-items: center;
+}
+
+.users-summary-card span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.users-summary-card strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-primary);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.users-session-card {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.users-session-card h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+}
+
+.users-session-card p {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.session-role-options {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.session-role-options button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid rgba(156, 163, 175, 0.55);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.session-role-options button.active {
+  border-color: var(--secondary);
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--secondary);
+}
+
+.users-layout {
+  display: block;
+}
+
+.users-card {
+  padding: 22px;
+}
+
+.users-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--secondary);
+}
+
+.users-card-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.users-card-header p {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.user-role-cell select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1.5px solid var(--text-secondary);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+
+.user-role-cell select:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.users-table-wrap {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th {
+  padding: 0 14px 12px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.users-table td {
+  padding: 14px;
+  border-top: 1px solid rgba(156, 163, 175, 0.24);
+  color: var(--text-primary);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.users-table td:first-child strong,
+.users-table td:first-child span {
+  display: block;
+}
+
+.users-table td:first-child span {
+  margin-top: 3px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.user-role-cell {
+  display: grid;
+  grid-template-columns: 122px minmax(150px, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.role-admin {
+  background: rgba(30, 58, 138, 0.14);
+  color: var(--primary);
+}
+
+.role-editor {
+  background: rgba(22, 163, 74, 0.14);
+  color: var(--success);
+}
+
+.role-viewer {
+  background: rgba(156, 163, 175, 0.22);
+  color: var(--text-primary);
+}
+
+.users-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.users-row-actions button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.users-save-action {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--secondary);
+}
+
+@media (max-width: 1440px) {
+  .users-main {
+    margin-left: 150px;
+    padding: 26px 32px 42px;
+  }
+
+  .users-header h1 {
+    font-size: 28px;
+  }
+
+  .users-card {
+    padding: 20px;
+  }
+}

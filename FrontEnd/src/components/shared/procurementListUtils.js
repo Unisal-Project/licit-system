@@ -1,4 +1,4 @@
-import { SECRETARIAS } from "../../utils/procurementOptions";
+import { PROCUREMENT_TYPES, SECRETARIAS } from "../../utils/procurementOptions";
 
 export const statusOptions = [
     { label: "Aguardando Abertura", value: "aguardando_abertura", dotClass: "gray", extraClass: "large-status" },
@@ -9,10 +9,7 @@ export const statusOptions = [
     { label: "Finalizado", value: "finalizado", dotClass: "dark" },
 ];
 
-export const tipoOptions = [
-    { label: "Pregão Eletrônico", value: "pregao_eletronico" },
-    { label: "Concorrência Pública", value: "concorrencia_publica" },
-];
+export const tipoOptions = PROCUREMENT_TYPES;
 
 export const origemOptions = SECRETARIAS;
 

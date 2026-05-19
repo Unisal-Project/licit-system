@@ -25,10 +25,16 @@ function DonutChart({ data = [] }) {
 
   return (
     <div className="donut-wrapper">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <svg
+        className="donut-chart"
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+      >
         {slices.map((slice) => (
           <circle
             key={slice.label}
+            className="donut-slice"
             cx={size / 2}
             cy={size / 2}
             r={radius}
@@ -39,6 +45,12 @@ function DonutChart({ data = [] }) {
             strokeDashoffset={slice.offset}
             strokeLinecap="butt"
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            style={{
+              "--slice-dash": slice.dash,
+              "--slice-gap": circumference - slice.dash,
+              "--slice-offset": slice.offset,
+              "--donut-circumference": circumference,
+            }}
           />
         ))}
       </svg>

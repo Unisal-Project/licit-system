@@ -1,6 +1,12 @@
 export const PROCUREMENT_TYPES = [
-  { label: "Pregão Eletrônico", value: "pregao_eletronico" },
+  { label: "Chamada Pública", value: "chamada_publica" },
+  { label: "Concorrência Presencial", value: "concorrencia_presencial"},
   { label: "Concorrência Pública", value: "concorrencia_publica" },
+  { label: "Credenciamento", value: "credenciamento" },
+  { label: "Dispensa Eletrônica", value: "dispensa_eletronica" },
+  { label: "Inexigibilidade", value: "inexigibilidade" },
+  { label: "Pregão Eletrônico", value: "pregao_eletronico" },
+  { label: "Pregão Presencial", value: "pregao_presencial" },
 ];
 
 export const STATUS_OPTIONS = [

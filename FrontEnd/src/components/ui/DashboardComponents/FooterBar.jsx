@@ -1,8 +1,15 @@
 import { Plus, Link2} from "lucide-react"
 import { useNavigate} from "react-router-dom";
+import { canManageProcurements, getCurrentUserRole } from "../../../utils/permissions";
 
 function FooterBar() {
     const navigate = useNavigate();
+    const canUseActions = canManageProcurements(getCurrentUserRole());
+
+    if (!canUseActions) {
+        return null;
+    }
+
     return (
         <div className="footer-acoes">
           <span className="footer-acoes-titulo">

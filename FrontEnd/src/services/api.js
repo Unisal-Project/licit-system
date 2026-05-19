@@ -3,6 +3,26 @@ export const API_BASE_URL =
 
 const REQUEST_TIMEOUT = 30000; // 30 segundos
 
+function formatErrorMessage(errorData, fallback) {
+  const detail = errorData?.detail || errorData?.message;
+
+  if (!detail) {
+    return fallback;
+  }
+
+  if (typeof detail === "string") {
+    return detail;
+  }
+
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => item?.msg || item?.message || JSON.stringify(item))
+      .join(" ");
+  }
+
+  return detail?.msg || detail?.message || JSON.stringify(detail);
+}
+
 export async function apiRequest(path, options = {}) {
   const isFormData = options.body instanceof FormData;
 
@@ -25,7 +45,7 @@ export async function apiRequest(path, options = {}) {
 
       try {
         const errorData = await response.json();
-        message = errorData?.detail || errorData?.message || message;
+        message = formatErrorMessage(errorData, message);
       } catch {
         message = response.statusText || message;
       }

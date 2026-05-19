@@ -1,4 +1,4 @@
-import React from "react"
+import AnimatedNumber from "./AnimatedNumber.jsx"
 
 function InfoCard({ label, value, loading, icon: Icon, iconClass = "", valueClass = "" }) {
     return (
@@ -7,7 +7,7 @@ function InfoCard({ label, value, loading, icon: Icon, iconClass = "", valueClas
                 <span className="card-label">{label}</span>
 
                 <span className={`card-valor ${valueClass}`}>
-          {loading ? "..." : value}
+          {loading ? "..." : <AnimatedNumber value={value} />}
         </span>
             </div>
 

@@ -9,12 +9,15 @@ import {
 } from "../utils/procurementOptions";
 import { mapApiAttachment } from "./attachmentService";
 
-const DEFAULT_USER_ID = Number(import.meta.env.VITE_DEFAULT_USER_ID);
+const configuredDefaultUserId = Number(import.meta.env.VITE_DEFAULT_USER_ID);
+const DEFAULT_USER_ID = Number.isInteger(configuredDefaultUserId) && configuredDefaultUserId > 0
+  ? configuredDefaultUserId
+  : 1;
 
 // Validar que user_id foi fornecido
-if (!DEFAULT_USER_ID || DEFAULT_USER_ID === 0) {
+if (!Number.isInteger(configuredDefaultUserId) || configuredDefaultUserId <= 0) {
   console.warn(
-    "⚠️ VITE_DEFAULT_USER_ID não configurado. Defina a variável de ambiente."
+    "VITE_DEFAULT_USER_ID não configurado. Usando usuário sistema padrão ID 1."
   );
 }
 

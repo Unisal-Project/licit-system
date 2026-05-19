@@ -23,6 +23,40 @@ body {
     background: var(--bg);
 }
 
+@keyframes page-soft-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main,
+.content,
+.procurement-main,
+.create-procurements-main,
+.settings-main,
+.users-main,
+.unsupported-page {
+    animation: page-soft-enter 0.36s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .main,
+    .content,
+    .procurement-main,
+    .create-procurements-main,
+    .settings-main,
+    .users-main,
+    .unsupported-page {
+        animation: none;
+    }
+}
+
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);

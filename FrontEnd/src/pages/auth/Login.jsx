@@ -88,7 +88,7 @@ function Login() {
 
                         <Button
                             as={NavLink}
-                            to="/procurements"
+                            to="/dashboard"
                             className="btn-login"
                         >
                             Entrar

@@ -15,7 +15,14 @@ import DetailsProcurements from "../pages/procurements/DetailsProcurements.jsx";
 
 import RemoteAccess from "../pages/remote-access/RemoteAccess.jsx";
 import Settings from "../pages/settings/Settings.jsx";
+import UsersManagement from "../pages/users/UsersManagement.jsx";
 import UnsupportedPlatform from "../pages/unsupported/UnsupportedPlatform.jsx";
+import {
+    canManageProcurements,
+    canManageRemoteAccess,
+    canManageUsers,
+    getCurrentUserRole,
+} from "../utils/permissions.js";
 
 function useUnsupportedPlatform() {
     const getIsUnsupported = () => {
@@ -56,6 +63,16 @@ function PlatformRoute({ children }) {
     return children;
 }
 
+function PermissionRoute({ children, canAccess, fallback = "/procurements" }) {
+    const currentRole = getCurrentUserRole();
+
+    if (!canAccess(currentRole)) {
+        return <Navigate to={fallback} replace />;
+    }
+
+    return children;
+}
+
 function AppRoutes() {
     return (
         <BrowserRouter>
@@ -67,11 +84,12 @@ function AppRoutes() {
                 <Route path="/dashboard" element={<PlatformRoute><Dashboard /></PlatformRoute>} />
 
                 <Route path="/procurements" element={<PlatformRoute><ProcurementList /></PlatformRoute>} />
-                <Route path="/procurements/create" element={<PlatformRoute><CreateProcurements /></PlatformRoute>} />
-                <Route path="/procurements/edit/:id" element={<PlatformRoute><EditProcurements /></PlatformRoute>} />
+                <Route path="/procurements/create" element={<PlatformRoute><PermissionRoute canAccess={canManageProcurements}><CreateProcurements /></PermissionRoute></PlatformRoute>} />
+                <Route path="/procurements/edit/:id" element={<PlatformRoute><PermissionRoute canAccess={canManageProcurements}><EditProcurements /></PermissionRoute></PlatformRoute>} />
                 <Route path="/procurements/:id" element={<PlatformRoute><DetailsProcurements /></PlatformRoute>} />
 
-                <Route path="/remote-access" element={<PlatformRoute><RemoteAccess /></PlatformRoute>} />
+                <Route path="/remote-access" element={<PlatformRoute><PermissionRoute canAccess={canManageRemoteAccess}><RemoteAccess /></PermissionRoute></PlatformRoute>} />
+                <Route path="/users" element={<PlatformRoute><PermissionRoute canAccess={canManageUsers}><UsersManagement /></PermissionRoute></PlatformRoute>} />
                 <Route path="/settings" element={<PlatformRoute><Settings /></PlatformRoute>} />
 
                 <Route path="*" element={<Navigate to="/procurements" replace />} />

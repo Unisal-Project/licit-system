@@ -7,14 +7,19 @@
     border-bottom-right-radius: 60px;
     top: 0;
     width: 190px;
+    z-index: 1000;
 }
 
 .icon {
+    --item-size: 80px;
+    --item-gap: 42px;
+    --active-index: 0;
     height: 100%;
     padding-top: 72px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 }
 
 .iconItem {
@@ -25,7 +30,10 @@
     color: var(--bg);
     text-decoration: none;
     font-size: 50px;
-    margin-bottom: 42px;
+    width: var(--item-size);
+    height: var(--item-size);
+    margin-bottom: var(--item-gap);
+    z-index: 2;
 }
 
 .iconItem i {
@@ -50,14 +58,21 @@
 }
 
 .activeIndicator {
-    margin-top: -5px;
     position: absolute;
-    width: 80px;
-    height: 80px;
+    top: 72px;
+    left: 50%;
+    width: var(--item-size);
+    height: var(--item-size);
     background-color: var(--secondary);
     opacity: 60%;
     border-radius: 20px;
     z-index: 1;
+    transform: translateX(-50%) translateY(
+        calc(var(--active-index) * (var(--item-size) + var(--item-gap)))
+    );
+    transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+    pointer-events: none;
 }
 
 .exitIndicator {
@@ -77,13 +92,16 @@
     }
 
     .icon {
+        --item-size: 60px;
+        --item-gap: 30px;
         height: 100%;
         padding-top: 54px;
     }
 
     .activeIndicator{
-        width: 60px;
-        height: 60px;
+        top: 54px;
+        width: var(--item-size);
+        height: var(--item-size);
     }
 
     .iconItem {

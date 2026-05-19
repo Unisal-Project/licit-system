@@ -1,4 +1,5 @@
 import { FileText, Clock, XCircle, PauseCircle, CheckSquare } from "lucide-react"
+import AnimatedNumber from "./AnimatedNumber.jsx"
 
 const STAT_CONFIG = [
     {
@@ -50,7 +51,7 @@ function CardStats({ summary = {}, loading }) {
                         </div>
 
                         <span className={`stat-valor ${stat.colorClass}`}>
-              {loading ? "..." : summary[stat.key] ?? 0}
+              {loading ? "..." : <AnimatedNumber value={summary[stat.key] ?? 0} />}
             </span>
                     </div>
                 )

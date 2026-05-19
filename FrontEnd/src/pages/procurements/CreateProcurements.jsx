@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import { Button, Input } from "../../components/ui/main";
-import { ArrowLeft, CalendarDays, FileText, Folder, Home, Landmark, Paperclip, Pencil, Save, Upload, UserRoundCog, X, CircleDollarSign } from "lucide-react"
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, FileText, Folder, Home, Landmark, Paperclip, Pencil, Save, Upload, UserRoundCog, X, CircleDollarSign } from "lucide-react"
 import { createProcurement, getDepartmentOptions } from "../../services/procurementService";
 import { uploadAttachments } from "../../services/attachmentService";
 import { customSelectStyles } from "../../components/shared/styleSelect";
@@ -130,21 +130,152 @@ function SelectField({ label, value, onChange, options, placeholder = "Selecione
   );
 }
 
+const CALENDAR_WEEKDAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
+const CALENDAR_MONTHS = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+const YEAR_RANGE_SIZE = 12;
+
+const toDateInputValue = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const getDateFromInputValue = (date) => {
+  if (!date) return null;
+
+  const [year, month, day] = date.split("-").map(Number);
+
+  return new Date(year, month - 1, day);
+};
+
+const getCalendarDays = (monthDate) => {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const previousMonthLastDay = new Date(year, month, 0).getDate();
+  const days = [];
+
+  for (let index = firstDay.getDay() - 1; index >= 0; index -= 1) {
+    days.push({
+      date: new Date(year, month - 1, previousMonthLastDay - index),
+      outsideMonth: true,
+    });
+  }
+
+  for (let day = 1; day <= lastDay.getDate(); day += 1) {
+    days.push({
+      date: new Date(year, month, day),
+      outsideMonth: false,
+    });
+  }
+
+  while (days.length % 7 !== 0) {
+    const day = days.length - firstDay.getDay() - lastDay.getDate() + 1;
+    days.push({
+      date: new Date(year, month + 1, day),
+      outsideMonth: true,
+    });
+  }
+
+  return days;
+};
+
 function DateField({ label, value, onChange }) {
-  const inputRef = React.useRef(null);
+  const wrapperRef = React.useRef(null);
+  const selectedDate = getDateFromInputValue(value);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [visibleMonth, setVisibleMonth] = useState(selectedDate || new Date());
+  const [calendarView, setCalendarView] = useState("days");
+
+  useEffect(() => {
+    if (selectedDate) {
+      setVisibleMonth(selectedDate);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (!isCalendarOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (!wrapperRef.current?.contains(event.target)) {
+        setIsCalendarOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isCalendarOpen]);
 
   const openCalendar = () => {
-    inputRef.current?.showPicker?.();
-    inputRef.current?.focus();
+    setIsCalendarOpen(true);
   };
 
   const displayValue = value ? formatDateToBrazilian(value) : "Selecione a data";
+  const calendarDays = getCalendarDays(visibleMonth);
+  const selectedInputValue = value || "";
+  const todayInputValue = toDateInputValue(new Date());
+
+  const changeMonth = (monthOffset) => {
+    setVisibleMonth((currentMonth) => (
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, 1)
+    ));
+  };
+
+  const changeYearRange = (yearOffset) => {
+    setVisibleMonth((currentMonth) => (
+      new Date(currentMonth.getFullYear() + yearOffset, currentMonth.getMonth(), 1)
+    ));
+  };
+
+  const selectMonth = (monthIndex) => {
+    setVisibleMonth((currentMonth) => (
+      new Date(currentMonth.getFullYear(), monthIndex, 1)
+    ));
+    setCalendarView("days");
+  };
+
+  const selectYear = (year) => {
+    setVisibleMonth((currentMonth) => (
+      new Date(year, currentMonth.getMonth(), 1)
+    ));
+    setCalendarView("months");
+  };
+
+  const selectDate = (date) => {
+    onChange(toDateInputValue(date));
+    setIsCalendarOpen(false);
+    setCalendarView("days");
+  };
+
+  const currentYear = visibleMonth.getFullYear();
+  const startYear = currentYear - (currentYear % YEAR_RANGE_SIZE);
+  const years = Array.from(
+    { length: YEAR_RANGE_SIZE },
+    (_, index) => startYear + index
+  );
 
   return (
     <label className="edit-field">
       <span>{label}</span>
 
-      <div className="date-input-container">
+      <div className="date-input-container" ref={wrapperRef}>
         <button
           type="button"
           className="date-icon-button"
@@ -161,14 +292,107 @@ function DateField({ label, value, onChange }) {
           {displayValue}
         </button>
 
-        <input
-          ref={inputRef}
-          className="date-native-input"
-          type="date"
-          value={value || ""}
-          onChange={(event) => onChange(event.target.value)}
-          aria-label={label}
-        />
+        {isCalendarOpen && (
+          <div className="ios-calendar" role="dialog" aria-label={`Selecionar ${label}`}>
+            <div className="ios-calendar-header">
+              <button
+                type="button"
+                onClick={() => calendarView === "years" ? changeYearRange(-YEAR_RANGE_SIZE) : changeMonth(-1)}
+                aria-label={calendarView === "years" ? "Anos anteriores" : "Mês anterior"}
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <button
+                type="button"
+                className="ios-calendar-title-button"
+                onClick={() => setCalendarView(calendarView === "days" ? "months" : "days")}
+              >
+                {CALENDAR_MONTHS[visibleMonth.getMonth()]} {visibleMonth.getFullYear()}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => calendarView === "years" ? changeYearRange(YEAR_RANGE_SIZE) : changeMonth(1)}
+                aria-label={calendarView === "years" ? "Próximos anos" : "Próximo mês"}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+
+            {calendarView === "days" && (
+              <>
+                <div className="ios-calendar-weekdays">
+                  {CALENDAR_WEEKDAYS.map((weekday, index) => (
+                    <span key={`${weekday}-${index}`}>{weekday}</span>
+                  ))}
+                </div>
+
+                <div className="ios-calendar-grid">
+                  {calendarDays.map(({ date, outsideMonth }) => {
+                    const dateInputValue = toDateInputValue(date);
+                    const isSelected = dateInputValue === selectedInputValue;
+                    const isToday = dateInputValue === todayInputValue;
+
+                    return (
+                      <button
+                        type="button"
+                        key={dateInputValue}
+                        className={[
+                          "ios-calendar-day",
+                          outsideMonth ? "is-outside-month" : "",
+                          isSelected ? "is-selected" : "",
+                          isToday ? "is-today" : "",
+                        ].filter(Boolean).join(" ")}
+                        onClick={() => selectDate(date)}
+                      >
+                        {date.getDate()}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {calendarView === "months" && (
+              <div className="ios-calendar-picker-grid">
+                {CALENDAR_MONTHS.map((month, index) => (
+                  <button
+                    type="button"
+                    key={month}
+                    className={`ios-calendar-picker-option${index === visibleMonth.getMonth() ? " is-selected" : ""}`}
+                    onClick={() => selectMonth(index)}
+                  >
+                    {month.slice(0, 3)}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  className="ios-calendar-picker-option ios-calendar-year-shortcut"
+                  onClick={() => setCalendarView("years")}
+                >
+                  {visibleMonth.getFullYear()}
+                </button>
+              </div>
+            )}
+
+            {calendarView === "years" && (
+              <div className="ios-calendar-picker-grid">
+                {years.map((year) => (
+                  <button
+                    type="button"
+                    key={year}
+                    className={`ios-calendar-picker-option${year === visibleMonth.getFullYear() ? " is-selected" : ""}`}
+                    onClick={() => selectYear(year)}
+                  >
+                    {year}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </label>
   );

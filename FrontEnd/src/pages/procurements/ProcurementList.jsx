@@ -8,9 +8,11 @@ import { statusOptions, tipoOptions, origemOptions, filterProcurements, paginate
 import { getCurrentProcurementStatus } from "../../components/shared/procurementDeadline.js"
 import { getAllProcurements, getDepartmentOptions } from "../../services/procurementService.js";
 import { PROCUREMENT_TYPES, SECRETARIAS, getOptionLabel } from "../../utils/procurementOptions";
+import { canManageProcurements, getCurrentUserRole } from "../../utils/permissions.js";
 
 function ProcurementList() {
     const navigate = useNavigate();
+    const canCreateProcurement = canManageProcurements(getCurrentUserRole());
     const [data, setData] = useState([]);
     const [secretariaOptions, setSecretariaOptions] = useState(origemOptions);
     const [loading, setLoading] = useState(true);
@@ -182,7 +184,7 @@ function ProcurementList() {
                             }`}
                             onClick={() => setShowFilter(!showFilter)}
                         >
-                            <Funnel size={80} />
+                            <Funnel />
                         </button>
 
                         {showFilter && (
@@ -277,14 +279,16 @@ function ProcurementList() {
                         )}
                     </div>
 
-                    <Button
-                        className="btn-New"
-                        variant="primary"
-                        onClick={irParaSelecao}
-                    >
-                        <PlusCircle size={18} />
-                        Nova Licitação
-                    </Button>
+                    {canCreateProcurement && (
+                        <Button
+                            className="btn-New"
+                            variant="primary"
+                            onClick={irParaSelecao}
+                        >
+                            <PlusCircle size={18} />
+                            Nova Licitação
+                        </Button>
+                    )}
                 </div>
 
                 <div className="pagination-modern">
@@ -324,9 +328,9 @@ function ProcurementList() {
                         </tr>
                         </thead>
 
-                        <tbody>
+                        <tbody key={currentPage} className="table-body-page">
                         {currentItems.length > 0 ? (
-                            currentItems.map((item) => {
+                            currentItems.map((item, index) => {
 
                                 const currentStatus = getCurrentProcurementStatus(item);
 
@@ -334,6 +338,7 @@ function ProcurementList() {
                                     <tr
                                         key={item.id}
                                         className="table-row-clickable"
+                                        style={{ "--row-index": index }}
                                         onClick={() =>
                                             navigate(`/procurements/${item.id}`, {
                                                 state: { from: "/procurements" },
@@ -349,7 +354,7 @@ function ProcurementList() {
                                         <td>{item.abertura}</td>
                                         <td>
                                             <span
-                                                className="status-dot"
+                                                className="status-dot table-status-dot"
                                                 style={{
                                                     backgroundColor: getStatusColor(currentStatus),
                                                 }}

@@ -7,12 +7,12 @@ import Button from "../../components/ui/Button/Button"
 import { Home, ArrowLeft, Copy, AlertCircle, User, Lock, Link } from "lucide-react"
 import { useNavigate } from 'react-router-dom';
 import { customSelectStyles } from "../../components/shared/styleSelect";
+import { USER_ROLES } from "../../utils/permissions";
 import "./RemoteAccess.css"
 
 const PERFIL_OPTIONS = [
-  { value: "Apenas visualização", label: "Apenas visualização" },
-  { value: "Editor", label: "Editor" },
-  { value: "Administrador", label: "Administrador" },
+  { value: USER_ROLES.VIEWER, label: "Visualizador" },
+  { value: USER_ROLES.EDITOR, label: "Editor" },
 ];
 
 const VALIDADE_OPTIONS = [

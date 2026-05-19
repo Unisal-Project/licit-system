@@ -1,12 +1,12 @@
 import React, { useEffect, useState }from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Home, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Printer } from "lucide-react";
+import { ArrowLeft, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Printer } from "lucide-react";
 import Sidebar from "../../components/layout/Sidebar";
 import { Card, InfoField, StatusBadge, Button, AttachmentModal } from "../../components/ui/main";
 import { getDeadlineInfo, getCurrentProcurementStatus } from "../../components/shared/procurementDeadline";
-import FormatProcurements from "../../components/shared/FormatProcurements";
 import { getProcurementById } from "../../services/procurementService";
 import { PROCUREMENT_TYPES, getOptionLabel } from "../../utils/procurementOptions";
+import { canManageProcurements, getCurrentUserRole } from "../../utils/permissions";
 import "./DetailsProcurements.css";
 
 function DetailsProcurements() {
@@ -14,7 +14,9 @@ function DetailsProcurements() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleBack = () => { navigate(location.state?.from || "/dashboard");}
+  const handleBack = () => {
+    navigate(location.state?.from || "/dashboard");
+  };
 
   const [procurement, setProcurement] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,10 +55,16 @@ function DetailsProcurements() {
   const anexos = procurement.anexos ?? [];
   const currentStatus = getCurrentProcurementStatus(procurement);
   const deadlineInfo = getDeadlineInfo(procurement);
+  const canEditProcurement = canManageProcurements(getCurrentUserRole());
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
     <div className="procurement-page">
-      <Sidebar />
+      <div className="screen-sidebar">
+        <Sidebar />
+      </div>
 
       <main className="procurement-main">
         <header className="page-header">
@@ -74,12 +82,6 @@ function DetailsProcurements() {
               <p>Visualize informações da licitação</p>
             </div>
           </div>
-
-          <nav className="breadcrumb">
-            <Home size={15} />
-            <span>/ Licitações /</span>
-            <strong>{tituloLicitacao}</strong>
-          </nav>
         </header>
 
         <section className="details-container">
@@ -92,15 +94,21 @@ function DetailsProcurements() {
             <div className="details-actions">
               <AttachmentModal anexos={anexos} />
 
-              <Link to={`/procurements/edit/${id}`}
-                    state={{from: location.state?.from || "/procurements"}}>
-                <Button variant="secondary" className="btn-action btn-edit">
-                  <Pencil size={24} className="btn-icon" />
-                </Button>
-              </Link>
+              {canEditProcurement && (
+                <Link to={`/procurements/edit/${id}`}
+                      state={{from: location.state?.from || "/procurements"}}>
+                  <Button variant="secondary" className="btn-action btn-edit">
+                    <Pencil size={38} className="btn-icon" />
+                  </Button>
+                </Link>
+              )}
 
-              <Button variant="primary" className="btn-action btn-print">
-                <Printer size={24} />
+              <Button
+                variant="primary"
+                className="btn-action btn-print"
+                onClick={handlePrint}
+              >
+                <Printer size={38} />
               </Button>
             </div>
           </div>

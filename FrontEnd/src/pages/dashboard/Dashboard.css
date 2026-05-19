@@ -93,7 +93,14 @@
     position: relative;
     top: -25px;
     border: 1px solid var(--text-secondary);
+    animation: dashboard-soft-card 0.42s ease both;
 }
+
+.stat-card:nth-child(1) { animation-delay: 0.04s; }
+.stat-card:nth-child(2) { animation-delay: 0.08s; }
+.stat-card:nth-child(3) { animation-delay: 0.12s; }
+.stat-card:nth-child(4) { animation-delay: 0.16s; }
+.stat-card:nth-child(5) { animation-delay: 0.20s; }
 
 .stat-top {
     display: flex;
@@ -155,6 +162,7 @@
     flex: 1.4;
     margin-top: -25px;
     padding-bottom: 12px;
+    animation: dashboard-soft-card 0.46s ease 0.18s both;
 }
 
 .tabela-card .tabela {
@@ -203,6 +211,16 @@
 .linha-clicavel:hover {
     background: var(--bg-light);
 }
+
+.linha-dados {
+    animation: dashboard-soft-card 0.34s ease both;
+}
+
+.linha-dados:nth-child(1) { animation-delay: 0.28s; }
+.linha-dados:nth-child(2) { animation-delay: 0.34s; }
+.linha-dados:nth-child(3) { animation-delay: 0.40s; }
+.linha-dados:nth-child(4) { animation-delay: 0.46s; }
+.linha-dados:nth-child(5) { animation-delay: 0.52s; }
 
 .status-dot {
     width: 12px;
@@ -318,6 +336,7 @@
 .grafico-card {
     margin-top: -25px;
     width: 100%;
+    animation: dashboard-soft-card 0.45s ease 0.18s both;
 }
 
 .cards-total-row {
@@ -338,7 +357,11 @@
     justify-content: space-between;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     border: 1px solid var(--text-secondary);
+    animation: dashboard-soft-card 0.42s ease both;
 }
+
+.card-total:nth-child(1) { animation-delay: 0.24s; }
+.card-total:nth-child(2) { animation-delay: 0.30s; }
 
 .card-total .card-total-esquerda {
     display: flex;
@@ -384,6 +407,7 @@
     flex-direction: column;
     gap: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    animation: dashboard-soft-card 0.42s ease 0.36s both;
 }
 
 .footer-acoes-titulo {
@@ -412,12 +436,70 @@
     font-weight: 600;
     font-family: 'Poppins', sans-serif;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 
 .btn-acao:hover {
     background: var(--secondary);
     color: var(--bg);
+    transform: translateY(-1px);
+}
+
+.donut-chart {
+    overflow: visible;
+    animation: donut-appear 0.35s ease both;
+}
+
+.donut-slice {
+    animation: donut-open 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: stroke-dasharray, stroke-dashoffset;
+}
+
+.legenda-item {
+    animation: dashboard-soft-card 0.36s ease both;
+}
+
+.legenda-item:nth-child(1) { animation-delay: 0.22s; }
+.legenda-item:nth-child(2) { animation-delay: 0.28s; }
+.legenda-item:nth-child(3) { animation-delay: 0.34s; }
+.legenda-item:nth-child(4) { animation-delay: 0.40s; }
+.legenda-item:nth-child(5) { animation-delay: 0.46s; }
+.legenda-item:nth-child(6) { animation-delay: 0.52s; }
+
+@keyframes dashboard-soft-card {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes donut-appear {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes donut-open {
+    from {
+        stroke-dasharray: 0 var(--donut-circumference);
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dasharray: var(--slice-dash) var(--slice-gap);
+        stroke-dashoffset: var(--slice-offset);
+    }
 }
 
 
