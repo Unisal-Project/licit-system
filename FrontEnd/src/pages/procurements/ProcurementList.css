@@ -161,6 +161,7 @@ html, body {
 .input-search {
     width: 400px;
     margin-left: 10px;
+    border: 1px solid var(--text-secondary);
 }
 
 .input-search input::placeholder{
