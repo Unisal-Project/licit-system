@@ -17,7 +17,7 @@ def get_connection():
         if connection.is_connected():
             return connection
     except Error as e:
-        logger.error(f"Erro ao conectar ao banco de dados: {e}", exc_info=True)
+        logger.error(f"error connecting reason: {e}", exc_info=True)
         return None
 
 def close_resources(cursor=None, connection=None):
