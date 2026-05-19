@@ -293,11 +293,16 @@ body {
     font-size: 15px;
   }
 
-  .btn {
-    min-width: 140px;
-    height: 52px;
-    font-size: 14px;
-    border-radius: 11px;
+  .details-actions .btn-action {
+    width: 65px;
+    min-width: 65px;
+    height: 55px;
+    border-radius: 12px;
+  }
+
+  .details-actions .btn-action svg {
+    width: 22px;
+    height: 22px;
   }
 
   .details-actions {

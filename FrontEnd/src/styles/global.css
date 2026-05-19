@@ -12,15 +12,20 @@
     --aguardando: #777777;
     --select: #2564eb42;
     --active: #a6a6a7;
-    --scrollbar-track: rgba(156, 163, 175, 0.14);
-    --scrollbar-thumb: rgba(37, 99, 235, 0.58);
-    --scrollbar-thumb-hover: rgba(30, 58, 138, 0.78);
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: transparent;
+    --scrollbar-thumb-hover: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
     background: var(--bg);
+    overscroll-behavior-y: contain;
 }
 
 @keyframes page-soft-enter {
@@ -46,6 +51,11 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    html,
+    * {
+        scroll-behavior: auto;
+    }
+
     .main,
     .content,
     .procurement-main,
@@ -60,6 +70,8 @@ body {
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 *::-webkit-scrollbar {

@@ -103,7 +103,7 @@ CREATE TABLE `licitacoes` (
   `categoria_id`     int            NOT NULL,
   `numero`           int            NOT NULL,
   `ano`              int            NOT NULL,
-  `tipo`             enum('Pregão Eletrônico','Concorrência Pública') NOT NULL,
+  `tipo`             enum('Chamada Pública','Concorrência Pública', 'Concorrência Presencial','Credenciamento', 'Dispensa Eletrônica', 'Inexigibilidade', 'Pregão Eletrônico','Pregão Presencial') NOT NULL,
   `status`           enum('Aguardando Abertura','Aberto','Em Andamento','Suspenso','Revogado','Finalizado') DEFAULT 'Aguardando Abertura',
   `classificacao`    enum('Global','Item','Lote') DEFAULT 'Global',
   `objeto`           varchar(300)   DEFAULT NULL,
