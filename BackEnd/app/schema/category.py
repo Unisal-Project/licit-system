@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class CategoryCreate(BaseModel):
     nome: str
-    tipo: Optional[str] = "Comum"
+    tipo: Optional[str] = "Global"
 
 class CategoryUpdate(BaseModel):
     nome: Optional[str] = None

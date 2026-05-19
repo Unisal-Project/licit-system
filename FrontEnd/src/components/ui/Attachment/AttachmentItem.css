@@ -58,4 +58,5 @@
   justify-content: center;
   cursor: pointer;
   flex: 0 0 auto;
+  text-decoration: none;
 }

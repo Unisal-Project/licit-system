@@ -17,9 +17,15 @@ function AttachmentItem({ anexo }) {
         </div>
       </div>
 
-      <button className="attachment-download" type="button">
+      <a
+        className="attachment-download"
+        href={anexo.downloadUrl}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`Baixar ${anexo.nome}`}
+      >
         <Download size={15} />
-      </button>
+      </a>
     </div>
   );
 }

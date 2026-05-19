@@ -40,7 +40,12 @@ export function paginateItems(items, currentPage, itemsPerPage) {
 }
 
 export function getStatusColor(status) {
-    const normalizedStatus = status?.toUpperCase();
+    const normalizedStatus = String(status || "")
+        .replace(/_/g, " ")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toUpperCase()
+        .trim();
 
     const colors = {
         "AGUARDANDO ABERTURA": "var(--text-secondary)",

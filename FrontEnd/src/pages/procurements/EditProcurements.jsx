@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { ArrowLeft, Home, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Save, X, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Home, IdCard, Pencil, CalendarDays, FolderOpen, CircleDollarSign, Landmark, Save, X, Trash2 } from "lucide-react";
 import Sidebar from "../../components/layout/Sidebar";
 import { Card, Button, EditAttachmentsModal } from "../../components/ui/main";
-import { getProcurementById, updateProcurement, deleteProcurement } from "../../services/procurementService";
+import { getDepartmentOptions, getProcurementById, updateProcurement, deleteProcurement } from "../../services/procurementService";
+import { deleteAttachment, uploadAttachments } from "../../services/attachmentService";
 import { customSelectStyles } from "../../components/shared/styleSelect";
 import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
 import "./DetailsProcurements.css";
@@ -43,8 +44,8 @@ const formatDateToInput = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-const getSelectedSecretaria = (value) => {
-  return SECRETARIAS.find(
+const getSelectedSecretaria = (value, secretariaOptions = SECRETARIAS) => {
+  return secretariaOptions.find(
     (secretaria) => secretaria.value === value || secretaria.label === value
   );
 };
@@ -131,8 +132,8 @@ function SelectField({
   );
 }
 
-function SecretariaSelect({ value, onChange }) {
-  const selectedSecretaria = getSelectedSecretaria(value);
+function SecretariaSelect({ value, onChange, secretariaOptions }) {
+  const selectedSecretaria = getSelectedSecretaria(value, secretariaOptions);
 
   return (
     <label className="edit-field">
@@ -140,7 +141,7 @@ function SecretariaSelect({ value, onChange }) {
 
       <Select
         classNamePrefix="edit-secretaria-select"
-        options={SECRETARIAS}
+        options={secretariaOptions}
         placeholder="Procurar Secretaria"
         isSearchable
         value={selectedSecretaria || null}
@@ -155,6 +156,51 @@ function SecretariaSelect({ value, onChange }) {
   );
 }
 
+function DeleteConfirmModal({ title, loading, onCancel, onConfirm }) {
+  return (
+    <div className="delete-modal-overlay" role="presentation">
+      <section
+        className="delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+      >
+        <div className="delete-modal-icon">
+          <AlertTriangle size={28} />
+        </div>
+
+        <div className="delete-modal-content">
+          <h2 id="delete-modal-title">Excluir licitação?</h2>
+          <p>
+            Esta ação removerá permanentemente <strong>{title}</strong> e seus
+            anexos vinculados.
+          </p>
+        </div>
+
+        <div className="delete-modal-actions">
+          <Button
+            variant="secondary"
+            className="delete-modal-cancel"
+            onClick={onCancel}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+
+          <Button
+            className="delete-modal-confirm"
+            onClick={onConfirm}
+            disabled={loading}
+          >
+            <Trash2 size={18} />
+            {loading ? "Excluindo..." : "Excluir"}
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function EditProcurement() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -164,17 +210,28 @@ function EditProcurement() {
 
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [attachments, setAttachments] = useState([]);
+  const [secretariaOptions, setSecretariaOptions] = useState(SECRETARIAS);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [removedAttachmentIds, setRemovedAttachmentIds] = useState([]);
 
   useEffect(() => {
     async function loadProcurement() {
       try {
         setLoading(true);
 
-        const procurement = await getProcurementById(id);
+        const [procurement, departments] = await Promise.all([
+          getProcurementById(id),
+          getDepartmentOptions(),
+        ]);
+
+        setSecretariaOptions(departments);
 
         const selectedSecretaria = getSelectedSecretaria(
-          procurement.origem || procurement.secretaria
+          procurement.origem || procurement.secretaria,
+          departments
         );
 
         setFormData({
@@ -194,6 +251,8 @@ function EditProcurement() {
             procurement.origem ||
             procurement.secretaria ||
             "",
+          departmentId: procurement.departmentId || "",
+          categoryId: procurement.categoryId || "",
           criadoEm: procurement.criadoEm || "",
         });
 
@@ -239,6 +298,15 @@ function EditProcurement() {
   };
 
   const removeAttachment = (indexToRemove) => {
+    const attachmentToRemove = attachments[indexToRemove];
+
+    if (attachmentToRemove?.id) {
+      setRemovedAttachmentIds((currentIds) => [
+        ...currentIds,
+        attachmentToRemove.id,
+      ]);
+    }
+
     setAttachments((currentAttachments) =>
       currentAttachments.filter((_, index) => index !== indexToRemove)
     );
@@ -246,7 +314,12 @@ function EditProcurement() {
 
   const handleSave = async () => {
     try {
-      const selectedSecretaria = getSelectedSecretaria(formData.secretaria);
+      setSaving(true);
+
+      const selectedSecretaria = getSelectedSecretaria(
+        formData.secretaria,
+        secretariaOptions
+      );
 
       const editedProcurement = {
         numero: formData.numero,
@@ -287,39 +360,43 @@ function EditProcurement() {
       };
 
       await updateProcurement(id, editedProcurement);
+      await Promise.all(
+        removedAttachmentIds.map((attachmentId) =>
+          deleteAttachment(attachmentId)
+        )
+      );
+      await uploadAttachments(id, attachments);
 
       toast.success("Licitação editada com sucesso!");
 
       navigate(`/procurements/${id}`, {
-        state: { from: location.state?.from || "/procurem" },
+        state: { from: location.state?.from || "/procurements" },
       });
     } catch (error) {
       console.error("Erro ao editar licitação:", error);
-      toast.error("Erro ao editar licitação.");
+      toast.error(error.message || "Erro ao editar licitação.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-  const confirmDelete = window.confirm(
-    "Deseja realmente excluir esta licitação?"
-  );
+    try {
+      setDeleting(true);
+      await deleteProcurement(id);
 
-  if (!confirmDelete) {
-    return;
-  }
+      toast.success("Licitação excluída com sucesso!");
 
-  try {
-    await deleteProcurement(id);
+      navigate("/procurements");
+    } catch (error) {
+      console.error("Erro ao excluir licitação:", error);
 
-    toast.success("Licitação excluída com sucesso!");
-
-    navigate("/procurements");
-  } catch (error) {
-    console.error("Erro ao excluir licitação:", error);
-
-    toast.error("Erro ao excluir licitação.");
-  }
-};
+      toast.error(error.message || "Erro ao excluir licitação.");
+    } finally {
+      setDeleting(false);
+      setDeleteModalOpen(false);
+    }
+  };
 
   if (loading) {
     return <p>Carregando licitação...</p>;
@@ -369,7 +446,11 @@ function EditProcurement() {
                 removeAttachment={removeAttachment}
               />
 
-              <Button className="btn-action btn-delete" onClick={handleDelete}>
+              <Button
+                className="btn-action btn-delete"
+                onClick={() => setDeleteModalOpen(true)}
+                disabled={deleting}
+              >
                 <Trash2 size={24} />
               </Button>
 
@@ -377,7 +458,7 @@ function EditProcurement() {
                 <X size={24} />
               </Button>
 
-              <Button className="btn-action btn-save" onClick={handleSave}>
+              <Button className="btn-action btn-save" onClick={handleSave} disabled={saving}>
                 <Save size={24} />
               </Button>
             </div>
@@ -484,12 +565,22 @@ function EditProcurement() {
                 <SecretariaSelect
                   value={formData.secretaria}
                   onChange={(value) => updateField("secretaria", value)}
+                  secretariaOptions={secretariaOptions}
                 />
               </div>
             </Card>
           </div>
         </section>
       </main>
+
+      {deleteModalOpen && (
+        <DeleteConfirmModal
+          title={tituloLicitacao}
+          loading={deleting}
+          onCancel={() => setDeleteModalOpen(false)}
+          onConfirm={handleDelete}
+        />
+      )}
     </div>
   );
 }

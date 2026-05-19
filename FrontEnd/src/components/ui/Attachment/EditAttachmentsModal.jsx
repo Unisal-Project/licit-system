@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import "./AttachmentModal.css";
+import "./EditAttachmentsModal.css";
 
 function EditAttachmentsModal({
   attachments = [],

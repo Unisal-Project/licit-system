@@ -248,15 +248,30 @@
   }
 
   .register-logo {
-    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    top: -25px;
   }
 
   .register-logo-img {
-    width: 96px;
+    width: 150px;
   }
 
   .register-logo-name {
-    width: 160px;
+    width: 220px;
+    position: relative;
+    top: -5px;
+    right: 10px;
+  }
+
+  .register-logo p {
+    font-size: 12px;
+    position: relative;
+    left: 15px;
+    top: -15px;
   }
 
   .register-header h2 {
@@ -294,11 +309,11 @@
   }
 
   .register-deco-text h2 {
-    font-size: 26px;
+    font-size: 22px;
   }
 
   .register-deco-text p {
-    font-size: 17px;
+    font-size: 14px;
   }
 }
 
@@ -309,7 +324,25 @@
     padding: 28px 22px;
   }
 
+  .register-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    top: -25px;
+  }
+
+  .register-logo p{
+    font-size: 9px;
+    position: relative;
+  }
+
   .register-panel-deco {
+    display: none;
+  }
+
+  .register-login-text {
     display: none;
   }
 }
@@ -317,5 +350,24 @@
 @media (max-width: 640px) {
   .register-fields-row {
     grid-template-columns: 1fr;
+  }
+
+  .register-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .register-logo-name {
+    position: relative;
+    top: -6px;
+  }
+
+  .register-logo p{
+    font-size: 9px;
+    position: relative;
+    right: 5px;
+    top: 1px;
   }
 }

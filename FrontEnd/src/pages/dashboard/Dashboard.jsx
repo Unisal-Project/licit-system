@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import Sidebar from "../../components/layout/Sidebar"
 import { PageHeader, CardStats, ProcurementTable, ChartCard, InfoCard, FooterBar } from "../../components/ui/main"
 import { FolderOpen, ClockAlert } from "lucide-react"
-import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
 import { getAllProcurements, getLatestProcurements, getProcurementsChartData, getTotalProcurements, countProcurementsByStatus, updateOpeningStatuses } from "../../services/procurementService"
 import "./Dashboard.css"
 

@@ -8,20 +8,19 @@ function DonutChart({ data = [] }) {
     return <div className="donut-vazio">Sem dados</div>;
   }
 
-  let accumulatedDash = 0;
-
-  const slices = data.map((item) => {
+  const slices = data.map((item, index) => {
     const dash = (item.percent / 100) * circumference;
+    const previousDash = data
+      .slice(0, index)
+      .reduce((total, previousItem) => {
+        return total + (previousItem.percent / 100) * circumference;
+      }, 0);
 
-    const slice = {
+    return {
       ...item,
       dash,
-      offset: -accumulatedDash,
+      offset: -previousDash,
     };
-
-    accumulatedDash += dash;
-
-    return slice;
   });
 
   return (

@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import { Button, Input } from "../../components/ui/main";
 import { ArrowLeft, CalendarDays, FileText, Folder, Home, Landmark, Paperclip, Pencil, Save, Upload, UserRoundCog, X, CircleDollarSign } from "lucide-react"
-import { createProcurement } from "../../services/procurementService";
+import { createProcurement, getDepartmentOptions } from "../../services/procurementService";
+import { uploadAttachments } from "../../services/attachmentService";
 import { customSelectStyles } from "../../components/shared/styleSelect";
 import { PROCUREMENT_TYPES, CLASSIFICATION_OPTIONS, SECRETARIAS } from "../../utils/procurementOptions";
 import "./CreateProcurements.css"
@@ -318,7 +319,7 @@ function CardDatas({ formData, updateField }) {
   );
 }
 
-function CardOrigem({ formData, updateField }) {
+function CardOrigem({ formData, updateField, secretariaOptions }) {
   return (
     <FormCard
       icon={Landmark}
@@ -328,7 +329,7 @@ function CardOrigem({ formData, updateField }) {
     >
       <SelectField
         label="Secretaria Responsável:"
-        options={SECRETARIAS}
+        options={secretariaOptions}
         placeholder="Procurar Secretaria"
         value={formData.secretaria}
         onChange={(value) => updateField("secretaria", value)}
@@ -430,8 +431,8 @@ const formatDateToBrazilian = (date) => {
   return `${day}/${month}/${year}`
 }
 
-const getSelectedSecretaria = (value) => {
-  return SECRETARIAS.find(
+const getSelectedSecretaria = (value, secretariaOptions = SECRETARIAS) => {
+  return secretariaOptions.find(
     (secretaria) => secretaria.value === value || secretaria.label === value
   );
 };
@@ -442,6 +443,22 @@ function CreateProcurements() {
 
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [attachments, setAttachments] = useState([]);
+  const [secretariaOptions, setSecretariaOptions] = useState(SECRETARIAS);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadOptions() {
+      try {
+        const departments = await getDepartmentOptions();
+        setSecretariaOptions(departments);
+      } catch (error) {
+        console.error("Erro ao carregar secretarias:", error);
+        toast.error("Erro ao carregar secretarias da API.");
+      }
+    }
+
+    loadOptions();
+  }, []);
 
   const updateField = (fieldName, value) => {
     setFormData((currentData) => ({ ...currentData, [fieldName]: value }));
@@ -462,9 +479,10 @@ function CreateProcurements() {
   const handleSave = async () => {
 
     try {
+      setSaving(true);
 
       const selectedSecretaria =
-        getSelectedSecretaria(formData.secretaria)
+        getSelectedSecretaria(formData.secretaria, secretariaOptions)
 
       const newProcurement = {
 
@@ -512,7 +530,12 @@ function CreateProcurements() {
         })),
       }
 
-      await createProcurement(newProcurement)
+      const createdProcurement = await createProcurement(newProcurement)
+      const biddingId = createdProcurement?.bidding_id || createdProcurement?.id;
+
+      if (biddingId && attachments.length > 0) {
+        await uploadAttachments(biddingId, attachments);
+      }
 
       toast.success("Licitação criada com sucesso!")
 
@@ -520,7 +543,7 @@ function CreateProcurements() {
 
       setAttachments([])
 
-      navigate("/ProcurementList")
+      navigate("/procurements")
 
     } catch (error) {
 
@@ -529,7 +552,9 @@ function CreateProcurements() {
         error
       )
 
-      toast.error("Erro ao criar licitação.")
+      toast.error(error.message || "Erro ao criar licitação.")
+    } finally {
+      setSaving(false);
     }
   }
   return (
@@ -545,14 +570,18 @@ function CreateProcurements() {
           <CardClassificacao formData={formData} updateField={updateField} />
           <CardFinanceiro formData={formData} updateField={updateField} />
           <CardDatas formData={formData} updateField={updateField} />
-          <CardOrigem formData={formData} updateField={updateField} />
+          <CardOrigem
+            formData={formData}
+            updateField={updateField}
+            secretariaOptions={secretariaOptions}
+          />
           <CardAnexos attachments={attachments} addAttachments={addAttachments} removeAttachment={removeAttachment} />
         </div>
 
         <footer className="form-actions">
-          <Button variant="primary" onClick={handleSave}>
+          <Button variant="primary" onClick={handleSave} disabled={saving}>
             <Save size={22} />
-            Salvar
+            {saving ? "Salvando..." : "Salvar"}
           </Button>
           <Button variant="secondary" onClick={() => navigate(-1)}>Cancelar</Button>
         </footer>

@@ -34,6 +34,14 @@ CREATE TABLE `usuarios` (
   UNIQUE KEY `uq_usuario_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `perfil`, `ativo`) VALUES
+  (1, 'Usuário Sistema', 'sistema@licitsystem.local', 'sem-autenticacao-local', 'admin', 1)
+ON DUPLICATE KEY UPDATE
+  `nome` = VALUES(`nome`),
+  `email` = VALUES(`email`),
+  `perfil` = VALUES(`perfil`),
+  `ativo` = VALUES(`ativo`);
+
 -- Tabela: secretarias
 -- (sem dependências externas)
 DROP TABLE IF EXISTS `secretarias`;
@@ -77,6 +85,13 @@ CREATE TABLE `categorias` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+INSERT INTO `categorias` (`id`, `nome`, `tipo`) VALUES
+  (1, 'Global', 'Global'),
+  (2, 'Por Item', 'Item'),
+  (3, 'Por Lote', 'Lote')
+ON DUPLICATE KEY UPDATE
+  `nome` = VALUES(`nome`),
+  `tipo` = VALUES(`tipo`);
 
 -- Tabela: licitacoes
 -- (depende de: usuarios, secretarias, categorias)
@@ -89,7 +104,7 @@ CREATE TABLE `licitacoes` (
   `numero`           int            NOT NULL,
   `ano`              int            NOT NULL,
   `tipo`             enum('Pregão Eletrônico','Concorrência Pública') NOT NULL,
-  `status`           enum('Aberto','Em Andamento','Suspenso','Revogado','Finalizado') DEFAULT 'Aberto',
+  `status`           enum('Aguardando Abertura','Aberto','Em Andamento','Suspenso','Revogado','Finalizado') DEFAULT 'Aguardando Abertura',
   `classificacao`    enum('Global','Item','Lote') DEFAULT 'Global',
   `objeto`           varchar(300)   DEFAULT NULL,
   `descricao_objeto` text,

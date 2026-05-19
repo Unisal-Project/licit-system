@@ -1,4 +1,5 @@
 import Select from "react-select";
+import { customSelectStyles } from "../../shared/styleSelect";
 
 function SelectField({ label, value, onChange, options, placeholder = "Selecione", className = "" }) {
   const formattedOptions = options.map((option) => {

@@ -6,7 +6,7 @@ import { Card, InfoField, StatusBadge, Button, AttachmentModal } from "../../com
 import { getDeadlineInfo, getCurrentProcurementStatus } from "../../components/shared/procurementDeadline";
 import FormatProcurements from "../../components/shared/FormatProcurements";
 import { getProcurementById } from "../../services/procurementService";
-import { PROCUREMENT_TYPES, STATUS_OPTIONS, CLASSIFICATION_OPTIONS, SECRETARIAS, getOptionLabel, getOptionValue } from "../../utils/procurementOptions";
+import { PROCUREMENT_TYPES, getOptionLabel } from "../../utils/procurementOptions";
 import "./DetailsProcurements.css";
 
 function DetailsProcurements() {

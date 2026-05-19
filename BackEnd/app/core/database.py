@@ -21,10 +21,10 @@ def close_resources(cursor=None, connection=None):
     if cursor:
         try:
             cursor.close()
-        except Exeception:
+        except Exception:
             pass
     if connection:
         try:
             connection.close()
-        except Exeception:
+        except Exception:
             pass

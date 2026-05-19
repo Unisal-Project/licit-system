@@ -14,7 +14,7 @@ class BiddingCreate(BaseModel):
     year: int
 
     bidding_type: str
-    status: Optional[str] = "Aberto"
+    status: Optional[str] = "Aguardando Abertura"
     classification: Optional[str] = "Global"
 
     object_name: str

@@ -1,6 +1,44 @@
 from app.schema.bidding import BiddingCreate
 
 
+def ensure_status_enum_supports_waiting(cursor):
+    cursor.execute(
+        """
+        ALTER TABLE licitacoes
+        MODIFY status enum(
+            'Aguardando Abertura',
+            'Aberto',
+            'Em Andamento',
+            'Suspenso',
+            'Revogado',
+            'Finalizado'
+        ) DEFAULT 'Aguardando Abertura'
+        """
+    )
+
+
+def ensure_user_exists(user_id: int, cursor):
+    cursor.execute("SELECT id FROM usuarios WHERE id = %s", (user_id,))
+    if cursor.fetchone():
+        return user_id
+
+    cursor.execute(
+        """
+        INSERT INTO usuarios (id, nome, email, senha, perfil, ativo)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """,
+        (
+            user_id,
+            "Usuário Sistema",
+            "sistema@licitsystem.local",
+            "sem-autenticacao-local",
+            "admin",
+            1,
+        ),
+    )
+    return user_id
+
+
 def _build_where_clause(filters: dict = None):
     """
     Função auxiliar para construir dinamicamente a cláusula WHERE

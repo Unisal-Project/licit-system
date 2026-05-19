@@ -34,13 +34,13 @@ function Register() {
       <div className="register-panel-left">
           <div className="register-content">
             <div className="register-logo">
-            <div className="register-logo-row">
-              <img src={logo} alt="Logo LicitSys" className="register-logo-img" />
-              <img src={name} alt="LicitSys" className="register-logo-name" />
-            </div>
+              <div className="register-logo-row">
+                <img src={logo} alt="Logo LicitSys" className="register-logo-img" />
+                <img src={name} alt="LicitSys" className="register-logo-name" />
+              </div>
 
-            <p>Sistema de Gestão de Licitações</p>
-          </div>
+              <p>Sistema de Gestão de Licitações</p>
+            </div>
 
           <div className="register-header">
             <h2>Crie sua conta</h2>
@@ -135,7 +135,7 @@ function Register() {
           <img src={male_laptop} alt="Ilustração" className="register-ilustracao" />
 
           <div className="register-deco-text">
-            <h2>Comece com controle, segurança e transparência.</h2>
+            <h2>Comece com controle, <br /> segurança e transparência.</h2>
             <p>Organize as licitações da sua equipe em poucos minutos.</p>
           </div>
         </div>

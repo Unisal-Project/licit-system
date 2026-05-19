@@ -1,10 +1,24 @@
 import os
 import shutil
+from datetime import date
 from fastapi import HTTPException
 from app.core.database import get_connection, close_resources
 from app.repository import bidding as bidding_repo
 from app.repository import attachment as attachment_repo
 from app.schema.bidding import BiddingCreate, BiddingUpdate
+
+
+AUTOMATIC_STATUSES = {"Aguardando Abertura", "Aberto", None, ""}
+
+
+def _get_date_based_status(opening_date, current_status=None):
+    if current_status not in AUTOMATIC_STATUSES:
+        return current_status
+
+    if opening_date and opening_date > date.today():
+        return "Aguardando Abertura"
+
+    return "Aberto"
 
 def list_all_biddings(filters: dict = None, pagination: dict = None):
     connection = get_connection()
@@ -54,6 +68,9 @@ def create_new_bidding(data: BiddingCreate):
     
     cursor = connection.cursor(dictionary=True)
     try:
+        bidding_repo.ensure_status_enum_supports_waiting(cursor)
+        bidding_repo.ensure_user_exists(data.user_id, cursor)
+        data.status = _get_date_based_status(data.opening_date, data.status)
         bidding_id = bidding_repo.create(data, cursor)
         connection.commit()
         return {"message": "Bidding created successfully", "bidding_id": bidding_id}
@@ -70,11 +87,18 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
     
     cursor = connection.cursor(dictionary=True)
     try:
+        bidding_repo.ensure_status_enum_supports_waiting(cursor)
         bidding = bidding_repo.find_by_id(bidding_id, cursor)
         if not bidding:
             raise HTTPException(status_code=404, detail="Bidding not found")
 
         data_dict = data.model_dump(exclude_unset=True)
+        opening_date = data_dict.get("opening_date", bidding.get("data_abertura"))
+        current_status = data_dict.get("status", bidding.get("status"))
+
+        if current_status in AUTOMATIC_STATUSES:
+            data_dict["status"] = _get_date_based_status(opening_date, current_status)
+
         field_mapping = {
             "department_id": "secretaria_id",
             "category_id": "categoria_id",

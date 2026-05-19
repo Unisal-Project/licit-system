@@ -6,22 +6,31 @@ import { useNavigate } from "react-router-dom";
 import { Button, Input } from "../../components/ui/main.js";
 import { statusOptions, tipoOptions, origemOptions, filterProcurements, paginateItems, getStatusColor } from "../../components/shared/procurementListUtils.js";
 import { getCurrentProcurementStatus } from "../../components/shared/procurementDeadline.js"
-import { getAllProcurements } from "../../services/procurementService.js";
+import { getAllProcurements, getDepartmentOptions } from "../../services/procurementService.js";
 import { PROCUREMENT_TYPES, SECRETARIAS, getOptionLabel } from "../../utils/procurementOptions";
 
 function ProcurementList() {
     const navigate = useNavigate();
     const [data, setData] = useState([]);
+    const [secretariaOptions, setSecretariaOptions] = useState(origemOptions);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         async function loadProcurements() {
 
             try {
+                setLoading(true);
 
-                const procurements =
-                    await getAllProcurements()
+                const [procurements, departments] =
+                    await Promise.all([
+                        getAllProcurements(),
+                        getDepartmentOptions(),
+                    ])
 
                 setData(procurements)
+                setSecretariaOptions(departments)
+                setError("")
 
             } catch (error) {
 
@@ -29,6 +38,9 @@ function ProcurementList() {
                     "Erro ao carregar licitações:",
                     error
                 )
+                setError("Erro ao carregar licitações da API.")
+            } finally {
+                setLoading(false)
             }
         }
 
@@ -52,12 +64,14 @@ function ProcurementList() {
 
     const toggleFilter = (currentValue, selectedValue, setter) => {
         setter(currentValue === selectedValue ? "" : selectedValue);
+        setCurrentPage(1);
     };
 
     const clearFilters = () => {
         setSelectedStatus("");
         setSelectedTipo("");
         setSelectedOrigem("");
+        setCurrentPage(1);
     };
 
     useEffect(() => {
@@ -79,10 +93,6 @@ function ProcurementList() {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [selectedStatus, selectedTipo, selectedOrigem]);
 
     const filters = {
         status: selectedStatus,
@@ -234,7 +244,7 @@ function ProcurementList() {
                                     <h3 className="section-title">Origem</h3>
 
                                     <div className="filter-grid origin-grid">
-                                        {origemOptions.map((origin) => (
+                                        {secretariaOptions.map((origin) => (
                                             <button
                                                 key={origin.value}
                                                 title={origin.label}
@@ -351,7 +361,9 @@ function ProcurementList() {
                         ) : (
                             <tr>
                                 <td colSpan="6">
-                                    Nenhuma licitação encontrada.
+                                    {loading
+                                        ? "Carregando licitações..."
+                                        : error || "Nenhuma licitação encontrada."}
                                 </td>
                             </tr>
                         )}

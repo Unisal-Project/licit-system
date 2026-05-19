@@ -7,9 +7,9 @@ import Input from "../../components/ui/Input/Input";
 import "./Settings.css";
 
 const MOCK_PROFILE_FROM_DATABASE = {
-  nome: "Usuário LicitSys",
-  cpf: "000.000.000-00",
-  email: "usuario@licit-system.com",
+  nome: "",
+  cpf: "",
+  email: "",
 };
 
 const INITIAL_PASSWORD_FORM = {
@@ -135,10 +135,6 @@ function Settings() {
               <div className="settings-avatar">
                 <User size={48} />
               </div>
-
-              <button type="button" className="settings-avatar-button">
-                <Camera size={18} />
-              </button>
             </div>
 
             <h2>{profile.nome}</h2>
