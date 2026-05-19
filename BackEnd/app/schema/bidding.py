@@ -5,6 +5,16 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class GetAllBiddings(BaseModel):
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    number: Optional[int] = None,
+    year: Optional[int] = None,
+    department_id: Optional[int] = None,
+    category_id: Optional[int] = None,
+    status: Optional[str] = None,
+    search: Optional[str] = None
+
 class BiddingCreate(BaseModel):
     user_id: int
     department_id: int

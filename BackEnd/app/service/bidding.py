@@ -6,7 +6,9 @@ from app.core.database import get_connection, close_resources
 from app.repository import bidding as bidding_repo
 from app.repository import attachment as attachment_repo
 from app.schema.bidding import BiddingCreate, BiddingUpdate
+from app.utils.pagination import get_pagination
 
+from BackEnd.app.schema.bidding import GetAllBiddings
 
 AUTOMATIC_STATUSES = {"Aguardando Abertura", "Aberto", None, ""}
 
@@ -20,7 +22,19 @@ def _get_date_based_status(opening_date, current_status=None):
 
     return "Aberto"
 
-def list_all_biddings(filters: dict = None, pagination: dict = None):
+def list_all_biddings(data: GetAllBiddings):
+
+    filters = {
+        "number": data.number,
+        "year": data.year,
+        "department_id": data.department_id,
+        "category_id": data.category_id,
+        "status": data.status,
+        "search": data.search
+    }
+
+    pagination = get_pagination(data.page, data.limit)
+
     connection = get_connection()
     if not connection:
         raise HTTPException(status_code=500, detail="Database connection error")
@@ -69,14 +83,20 @@ def create_new_bidding(data: BiddingCreate):
     cursor = connection.cursor(dictionary=True)
     try:
         bidding_repo.ensure_status_enum_supports_waiting(cursor)
+
         bidding_repo.ensure_user_exists(data.user_id, cursor)
+
         data.status = _get_date_based_status(data.opening_date, data.status)
+
         bidding_id = bidding_repo.create(data, cursor)
         connection.commit()
+
         return {"message": "Bidding created successfully", "bidding_id": bidding_id}
+
     except Exception as e:
         if connection: connection.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
     finally:
         close_resources(cursor, connection)
 

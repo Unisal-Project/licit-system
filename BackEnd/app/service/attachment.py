@@ -36,7 +36,9 @@ def save_bidding_attachment(bidding_id: int, file: UploadFile):
     if not normalized_path.startswith(normalized_upload_dir):
         raise HTTPException(status_code=400, detail="Caminho de arquivo inválido")
 
+
     connection = get_connection()
+
     if not connection:
         raise HTTPException(status_code=500, detail="Database connection error")
     
@@ -70,6 +72,7 @@ def save_bidding_attachment(bidding_id: int, file: UploadFile):
 
 def remove_attachment(attachment_id: int):
     connection = get_connection()
+
     if not connection:
         raise HTTPException(status_code=500, detail="Database connection error")
     
