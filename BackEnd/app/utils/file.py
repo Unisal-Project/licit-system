@@ -24,7 +24,16 @@ def get_file_extension(filename: str) -> str:
             detail="Arquivo sem extensão"
         )
 
-    return filename.rsplit(".", 1)[1].lower()
+    extension = filename.rsplit(".", 1)[1].lower()
+    
+    # Validar comprimento da extensão
+    if len(extension) > 10 or len(extension) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Extensão de arquivo inválida"
+        )
+    
+    return extension
 
 
 def validate_file_extension(filename: str):
@@ -77,15 +86,27 @@ async def save_upload_file(file: UploadFile, upload_dir: str) -> dict:
 
     os.makedirs(upload_dir, exist_ok=True)
 
+    # Ler conteúdo em memória e validar antes de salvar
+    content = await file.read()
+    
+    # Validar tamanho ANTES de salvar no disco
+    size_bytes = len(content)
+    max_size_bytes = MAX_FILE_SIZE_MB * 1024 * 1024
+    
+    if size_bytes > max_size_bytes:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Arquivo excede o limite de {MAX_FILE_SIZE_MB}MB"
+        )
+    
+    # Agora salvar no disco (já foi validado)
     stored_filename = generate_unique_filename(file.filename)
     file_path = os.path.join(upload_dir, stored_filename)
-
-    content = await file.read()
 
     with open(file_path, "wb") as buffer:
         buffer.write(content)
 
-    size_kb = validate_file_size(file_path)
+    size_kb = round(size_bytes / 1024)
 
     return {
         "original_name": file.filename,

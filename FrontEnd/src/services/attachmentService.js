@@ -33,9 +33,19 @@ export async function uploadAttachment(biddingId, file) {
 export async function uploadAttachments(biddingId, files = []) {
   const uploadableFiles = files.filter((file) => file instanceof File);
 
-  return Promise.all(
-    uploadableFiles.map((file) => uploadAttachment(biddingId, file))
-  );
+  if (uploadableFiles.length === 0) {
+    return [];
+  }
+
+  try {
+    const results = await Promise.all(
+      uploadableFiles.map((file) => uploadAttachment(biddingId, file))
+    );
+    return results;
+  } catch (error) {
+    console.error("Erro ao fazer upload de arquivos:", error);
+    throw new Error("Falha ao fazer upload de um ou mais arquivos");
+  }
 }
 
 export async function deleteAttachment(attachmentId) {

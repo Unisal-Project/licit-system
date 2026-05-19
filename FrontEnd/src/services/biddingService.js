@@ -9,7 +9,14 @@ import {
 } from "../utils/procurementOptions";
 import { mapApiAttachment } from "./attachmentService";
 
-const DEFAULT_USER_ID = Number(import.meta.env.VITE_DEFAULT_USER_ID || 1);
+const DEFAULT_USER_ID = Number(import.meta.env.VITE_DEFAULT_USER_ID);
+
+// Validar que user_id foi fornecido
+if (!DEFAULT_USER_ID || DEFAULT_USER_ID === 0) {
+  console.warn(
+    "⚠️ VITE_DEFAULT_USER_ID não configurado. Defina a variável de ambiente."
+  );
+}
 
 export const PROCUREMENT_STATUS = {
   AGUARDANDO_ABERTURA: "aguardando_abertura",
@@ -113,6 +120,11 @@ function getDateBasedStatus(status, openingDate) {
     return normalizedStatus;
   }
 
+  // Validar se openingDate existe antes de fazer parse
+  if (!openingDate) {
+    return PROCUREMENT_STATUS.ABERTO;
+  }
+
   const parsedOpeningDate = parseDateOnly(openingDate);
 
   if (parsedOpeningDate && parsedOpeningDate > getTodayDateOnly()) {
@@ -194,7 +206,21 @@ function toDecimal(value) {
 
   const numericValue = Number(normalized);
 
-  return Number.isNaN(numericValue) ? null : numericValue;
+  // Validar se é um número válido e dentro de limites razoáveis
+  if (Number.isNaN(numericValue)) return null;
+  
+  // Limite máximo: 999.999.999,99
+  if (numericValue > 999999999.99) {
+    console.warn("Valor excede o limite máximo permitido");
+    return null;
+  }
+  
+  if (numericValue < 0) {
+    console.warn("Valor não pode ser negativo");
+    return null;
+  }
+
+  return numericValue;
 }
 
 function formatDateTime(value) {

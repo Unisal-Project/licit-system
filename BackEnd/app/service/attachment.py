@@ -20,6 +20,13 @@ def save_bidding_attachment(bidding_id: int, file: UploadFile):
 
     unique_name = f"{uuid.uuid4()}{file_ext}"
     file_path = os.path.join(target_dir, unique_name)
+    
+    # Normalizar path e validar que está dentro de UPLOAD_DIR
+    normalized_path = os.path.normpath(os.path.abspath(file_path))
+    normalized_upload_dir = os.path.normpath(os.path.abspath(UPLOAD_DIR))
+    
+    if not normalized_path.startswith(normalized_upload_dir):
+        raise HTTPException(status_code=400, detail="Caminho de arquivo inválido")
 
     connection = get_connection()
     if not connection:
@@ -28,15 +35,15 @@ def save_bidding_attachment(bidding_id: int, file: UploadFile):
     cursor = connection.cursor(dictionary=True)
 
     try:
-        with open(file_path, "wb") as buffer:
+        with open(normalized_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        file_size_kb = os.path.getsize(file_path) // 1024
+        file_size_kb = os.path.getsize(normalized_path) // 1024
 
         attachment_data = {
             "licitacao_id": bidding_id,
             "nome": file.filename,
-            "caminho": file_path,
+            "caminho": normalized_path,
             "tipo": file_ext.replace(".", ""),
             "categoria": "documento",
             "tamanho_kb": file_size_kb
@@ -48,7 +55,7 @@ def save_bidding_attachment(bidding_id: int, file: UploadFile):
 
     except Exception as e:
         if connection: connection.rollback()
-        if os.path.exists(file_path): os.remove(file_path)
+        if os.path.exists(normalized_path): os.remove(normalized_path)
         raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
     finally:
         close_resources(cursor, connection)
@@ -64,8 +71,10 @@ def remove_attachment(attachment_id: int):
         if not attachment:
             raise HTTPException(status_code=404, detail="Attachment not found.")
 
-        if os.path.exists(attachment['caminho']):
-            os.remove(attachment['caminho'])
+        # Validar existência de attachment e campo 'caminho'
+        if attachment and attachment.get('caminho'):
+            if os.path.exists(attachment['caminho']):
+                os.remove(attachment['caminho'])
 
         attachment_repo.delete_attachment(attachment_id, cursor)
         connection.commit()

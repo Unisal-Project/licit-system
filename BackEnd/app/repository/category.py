@@ -31,7 +31,17 @@ def create(data, cursor):
     return cursor.lastrowid
 
 def update(category_id, fields, values, cursor):
-    sql = f"UPDATE categorias SET {', '.join(fields)} WHERE id = %s"
+    # Whitelist de campos permitidos
+    ALLOWED_FIELDS = {"nome", "tipo"}
+    
+    # Validar campos
+    for field in fields:
+        if field not in ALLOWED_FIELDS:
+            raise ValueError(f"Campo não permitido: {field}")
+    
+    # Construir SET clause com placeholders
+    set_clause = ", ".join([f"{field} = %s" for field in fields])
+    sql = f"UPDATE categorias SET {set_clause} WHERE id = %s"
     cursor.execute(sql, values + [category_id])
     return cursor.rowcount
 

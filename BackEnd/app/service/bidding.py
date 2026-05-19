@@ -129,10 +129,12 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
         connection.commit()
         return bidding_repo.find_by_id(bidding_id, cursor)
     except HTTPException:
-        if connection: connection.rollback()
+        if connection:
+            connection.rollback()
         raise
     except Exception as e:
-        if connection: connection.rollback()
+        if connection:
+            connection.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         close_resources(cursor, connection)

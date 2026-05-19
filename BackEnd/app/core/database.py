@@ -1,6 +1,9 @@
 import mysql.connector
 from mysql.connector import Error
+import logging
 from app.core.config import DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+
+logger = logging.getLogger(__name__)
 
 def get_connection():
     try:
@@ -14,7 +17,7 @@ def get_connection():
         if connection.is_connected():
             return connection
     except Error as e:
-        print(f"Erro ao conectar ao banco de dados: {e}")
+        logger.error(f"Erro ao conectar ao banco de dados: {e}", exc_info=True)
         return None
 
 def close_resources(cursor=None, connection=None):
