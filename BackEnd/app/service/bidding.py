@@ -155,20 +155,30 @@ def delete_bidding_and_files(bidding_id: int):
         
         # Deleta licitação
         bidding_repo.delete(bidding_id, cursor)
+        
+        # COMMIT bem-sucedido do banco ANTES de deletar arquivos físicos
         connection.commit()
 
-        # Limpeza física
+        # Agora sim, limpeza física (após commit bem-sucedido)
         upload_dir = "uploads/licitacoes"
         bidding_folder = os.path.join(upload_dir, str(bidding_id))
-        if os.path.exists(bidding_folder):
-            shutil.rmtree(bidding_folder)
+        try:
+            if os.path.exists(bidding_folder):
+                shutil.rmtree(bidding_folder)
+        except Exception as file_error:
+            # Log do erro mas não falha a operação (banco já foi deletado com sucesso)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erro ao deletar arquivos da licitação {bidding_id}: {file_error}")
 
         return {"message": f"Bidding {bidding_id} and its files deleted successfully"}
     except HTTPException:
-        if connection: connection.rollback()
+        if connection:
+            connection.rollback()
         raise
     except Exception as e:
-        if connection: connection.rollback()
+        if connection:
+            connection.rollback()
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
     finally:
         close_resources(cursor, connection)

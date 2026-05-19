@@ -9,13 +9,22 @@ def find_attachment_by_id(attachment_id: int, cursor):
     return cursor.fetchone()
 
 def create_attachment(data: dict, cursor):
+    # Validar dados obrigatórios
+    if not data.get('licitacao_id'):
+        raise ValueError("licitacao_id é um campo obrigatório")
+    if not data.get('nome'):
+        raise ValueError("nome é um campo obrigatório")
+    
     query = """
         INSERT INTO anexos (licitacao_id, nome, caminho, tipo, categoria, tamanho_kb)
         VALUES (%s, %s, %s, %s, %s, %s)
     """
     values = (
-        data['licitacao_id'], data['nome'], data['caminho'],
-        data.get('tipo'), data.get('categoria', 'documento'),
+        data['licitacao_id'], 
+        data['nome'], 
+        data.get('caminho'),
+        data.get('tipo'), 
+        data.get('categoria', 'documento'),
         data.get('tamanho_kb')
     )
     cursor.execute(query, values)

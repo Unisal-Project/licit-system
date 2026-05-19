@@ -7,6 +7,7 @@ from app.core.database import get_connection, close_resources
 from app.repository import attachment as attachment_repo
 
 UPLOAD_DIR = "uploads/licitacoes"
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 def save_bidding_attachment(bidding_id: int, file: UploadFile):
     allowed_extensions = [".pdf", ".xlsx", ".xls", ".doc", ".docx"]
@@ -14,6 +15,13 @@ def save_bidding_attachment(bidding_id: int, file: UploadFile):
 
     if file_ext not in allowed_extensions:
         raise HTTPException(status_code=400, detail="File extension not allowed.")
+
+    # Validar tamanho do arquivo
+    if file.size and file.size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413, 
+            detail=f"File size exceeds maximum allowed size of 10MB"
+        )
 
     target_dir = os.path.join(UPLOAD_DIR, str(bidding_id))
     os.makedirs(target_dir, exist_ok=True)

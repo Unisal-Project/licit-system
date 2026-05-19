@@ -8,18 +8,18 @@ router = APIRouter(
     tags=["attachments"]
 )
 
-@router.post("/{attachment_id}", status_code=status.HTTP_201_CREATED )
+@router.post("/{bidding_id}", status_code=status.HTTP_201_CREATED)
 def upload_attachment(
-    attachment_id: int,
+    bidding_id: int,
     file: UploadFile = File(...)
 ):
-    return attachment_service.save_bidding_attachment(attachment_id, file)
+    return attachment_service.save_bidding_attachment(bidding_id, file)
 
-@router.get("/{attachment_id}", response_model=List[AttachmentResponse] )
+@router.get("/{bidding_id}", response_model=List[AttachmentResponse])
 def list_attachments(
-    attachment_id: int
+    bidding_id: int
 ):
-    return attachment_service.get_attachments_by_bidding(attachment_id)
+    return attachment_service.get_attachments_by_bidding(bidding_id)
 
 @router.get("/{attachment_id}/download")
 def download_attachment(
