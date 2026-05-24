@@ -1,16 +1,18 @@
-from fastapi import APIRouter, UploadFile, File, status
-from typing import List
+from fastapi import APIRouter, UploadFile, File, status, Depends
+from typing import List, Optional
 from app.schema.attachment import AttachmentResponse
 from app.service import attachment as attachment_service
+from app.utils.auth import get_current_user
 
 router = APIRouter(
     prefix="/attachments",
-    tags=["attachments"]
+    tags=["Attachments"]
 )
 
 @router.post("/{bidding_id}", status_code=status.HTTP_201_CREATED)
-def upload_attachment( bidding_id: int, file: UploadFile = File(...) ):
-    return attachment_service.save_bidding_attachment(bidding_id, file)
+def upload_attachment( bidding_id: int, file: UploadFile = File(...), current_user: dict = Depends(get_current_user) ):
+    user_id = int(current_user["sub"])
+    return attachment_service.save_bidding_attachment(bidding_id, file, user_id=user_id)
 
 
 @router.get("/{bidding_id}", response_model=List[AttachmentResponse])
@@ -24,6 +26,7 @@ def download_attachment(attachment_id: int):
 
 
 @router.delete("/{attachment_id}", status_code=status.HTTP_204_NO_CONTENT )
-def delete_attachment(attachment_id: int):
-    attachment_service.remove_attachment(attachment_id)
+def delete_attachment(attachment_id: int, current_user: dict = Depends(get_current_user)):
+    user_id = int(current_user["sub"])
+    attachment_service.remove_attachment(attachment_id, user_id=user_id)
     return None

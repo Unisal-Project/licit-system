@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.service import department as department_service
 from app.schema.department import DepartmentCreate, DepartmentUpdate
+from app.utils.auth import check_admin
 
 router = APIRouter(
     prefix="/departments",
@@ -16,13 +17,13 @@ def get_department_by_id(department_id: int):
     return department_service.get_department_details(department_id)
 
 @router.post("/")
-def create_department(data: DepartmentCreate):
+def create_department(data: DepartmentCreate, current_user: dict = Depends(check_admin)):
     return department_service.create_department(data)
 
 @router.patch("/{department_id}")
-def update_department(department_id: int, data: DepartmentUpdate):
+def update_department(department_id: int, data: DepartmentUpdate, current_user: dict = Depends(check_admin)):
     return department_service.update_department(department_id, data)
 
 @router.delete("/{department_id}")
-def delete_department(department_id: int):
+def delete_department(department_id: int, current_user: dict = Depends(check_admin)):
     return department_service.delete_department(department_id)

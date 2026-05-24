@@ -68,46 +68,48 @@ def ensure_user_exists(user_id: int, cursor):
     return user_id
 
 
-def _build_where_clause(filters: dict = None):
+def _build_where_clause(filters: dict = None, user_id: int = None):
     """
     Função auxiliar para construir dinamicamente a cláusula WHERE
     """
     conditions = []
     params = []
 
-    if not filters:
-        return "", []
+    if user_id is not None:
+        conditions.append("l.usuario_id = %s")
+        params.append(user_id)
 
-    # Mapeamento de filtros simples (chave_filtro: coluna_sql)
-    mapping = {
-        "number": "l.numero = %s",
-        "year": "l.ano = %s",
-        "department_id": "l.secretaria_id = %s",
-        "category_id": "l.categoria_id = %s",
-        "status": "l.status = %s"
-    }
+    if filters:
+        # Mapeamento de filtros simples (chave_filtro: coluna_sql)
+        mapping = {
+            "number": "l.numero = %s",
+            "year": "l.ano = %s",
+            "department_id": "l.secretaria_id = %s",
+            "category_id": "l.categoria_id = %s",
+            "status": "l.status = %s"
+        }
 
-    for key, condition in mapping.items():
-        if filters.get(key):
-            conditions.append(condition)
-            params.append(filters[key])
+        for key, condition in mapping.items():
+            if filters.get(key):
+                conditions.append(condition)
+                params.append(filters[key])
 
-    if filters.get("search"):
-        conditions.append("(l.objeto LIKE %s OR l.descricao_objeto LIKE %s)")
-        search_val = f"%{filters['search']}%"
-        params.extend([search_val, search_val])
+        if filters.get("search"):
+            conditions.append("(l.objeto LIKE %s OR l.descricao_objeto LIKE %s)")
+            search_val = f"%{filters['search']}%"
+            params.extend([search_val, search_val])
 
     # Une todas as condições com AND se houver alguma
     where_sql = " AND " + " AND ".join(conditions) if conditions else ""
     return where_sql, params
 
 
-def find_all(cursor, filters: dict = None, pagination: dict = None):
-    where_sql, params = _build_where_clause(filters)
+def find_all(cursor, filters: dict = None, pagination: dict = None, user_id: int = None):
+    where_sql, params = _build_where_clause(filters, user_id)
 
     sql = f"""
         SELECT
-            l.id, l.numero, l.ano, l.tipo, l.status, l.classificacao,
+            l.id, l.usuario_id, l.numero, l.ano, l.tipo, l.status, l.classificacao,
             l.objeto, l.valor_estimado, l.data_publicacao, l.data_abertura,
             l.criado_em, l.atualizado_em,
             s.nome AS secretaria, s.sigla AS secretaria_sigla,
@@ -127,8 +129,8 @@ def find_all(cursor, filters: dict = None, pagination: dict = None):
     return cursor.fetchall()
 
 
-def count_all(cursor, filters: dict = None):
-    where_sql, params = _build_where_clause(filters)
+def count_all(cursor, filters: dict = None, user_id: int = None):
+    where_sql, params = _build_where_clause(filters, user_id)
 
     sql = f"SELECT COUNT(*) as total FROM licitacoes l WHERE 1=1 {where_sql}"
 
@@ -137,7 +139,7 @@ def count_all(cursor, filters: dict = None):
     return result["total"] if result else 0
 
 
-def find_by_id(bidding_id: int, cursor):
+def find_by_id(bidding_id: int, cursor, user_id: int = None):
     sql = """
           SELECT l.id, \
                  l.usuario_id, \
@@ -162,9 +164,14 @@ def find_by_id(bidding_id: int, cursor):
           FROM licitacoes l
                    INNER JOIN secretarias s ON s.id = l.secretaria_id
                    INNER JOIN categorias c ON c.id = l.categoria_id
-          WHERE l.id = %s \
+          WHERE l.id = %s
           """
-    cursor.execute(sql, (bidding_id,))
+    params = [bidding_id]
+    if user_id is not None:
+        sql += " AND l.usuario_id = %s"
+        params.append(user_id)
+
+    cursor.execute(sql, tuple(params))
     return cursor.fetchone()
 
 
@@ -185,7 +192,7 @@ def create(data: BiddingCreate, cursor):
     return cursor.lastrowid
 
 
-def update(bidding_id: int, fields: list[str], values: list, cursor):
+def update(bidding_id: int, fields: list[str], values: list, cursor, user_id: int = None):
     # fields deve ser uma lista de strings formatadas como "coluna = %s"
     sql = f"""
         UPDATE licitacoes
@@ -193,11 +200,22 @@ def update(bidding_id: int, fields: list[str], values: list, cursor):
         WHERE id = %s
     """
     params = values + [bidding_id]
+    
+    if user_id is not None:
+        sql += " AND usuario_id = %s"
+        params.append(user_id)
+        
     cursor.execute(sql, params)
     return cursor.rowcount
 
 
-def delete(bidding_id: int, cursor):
+def delete(bidding_id: int, cursor, user_id: int = None):
     sql = "DELETE FROM licitacoes WHERE id = %s"
-    cursor.execute(sql, (bidding_id,))
+    params = [bidding_id]
+    
+    if user_id is not None:
+        sql += " AND usuario_id = %s"
+        params.append(user_id)
+        
+    cursor.execute(sql, params)
     return cursor.rowcount

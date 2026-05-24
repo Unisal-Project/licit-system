@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.service import category as category_service
 from app.schema.category import CategoryCreate, CategoryUpdate
+from app.utils.auth import check_admin
 
 router = APIRouter(
     prefix="/categories",
@@ -16,13 +17,13 @@ def get_category_by_id(category_id: int):
     return category_service.get_category_details(category_id)
 
 @router.post("/")
-def create_category(data: CategoryCreate):
+def create_category(data: CategoryCreate, current_user: dict = Depends(check_admin)):
     return category_service.create_category(data)
 
 @router.patch("/{category_id}")
-def update_category(category_id: int, data: CategoryUpdate):
+def update_category(category_id: int, data: CategoryUpdate, current_user: dict = Depends(check_admin)):
     return category_service.update_category(category_id, data)
 
 @router.delete("/{category_id}")
-def delete_category(category_id: int):
+def delete_category(category_id: int, current_user: dict = Depends(check_admin)):
     return category_service.delete_category(category_id)

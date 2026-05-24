@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 
-from app.router import bidding_router, department, category, attachment, dashboard
+from app.router import bidding, department, category, attachment, dashboard, auth
 
 app = FastAPI(
     title="LicitSystem API",
@@ -34,11 +34,12 @@ if not os.path.exists(UPLOAD_DIR):
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Registro de Rotas
-app.include_router(department.router)
-app.include_router(category.router)
-app.include_router(bidding_router.router)
-app.include_router(attachment.router)
-app.include_router(dashboard.router)
+app.include_router(auth.router, prefix="/v1")
+app.include_router(department.router, prefix="/v1")
+app.include_router(category.router, prefix="/v1")
+app.include_router(bidding.router, prefix="/v1")
+app.include_router(attachment.router, prefix="/v1")
+app.include_router(dashboard.router, prefix="/v1")
 
 @app.get("/", tags=["Root"])
 def read_root():

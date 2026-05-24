@@ -1,6 +1,12 @@
-def get_summary(cursor):
+def get_summary(cursor, user_id: int = None):
+    where_clause = ""
+    params = []
 
-    sql = """
+    if user_id is not None and user_id != 0:
+        where_clause = "WHERE usuario_id = %s"
+        params.append(user_id)
+
+    sql = f"""
         SELECT
             COUNT(*) AS total,
             COALESCE(SUM(status = 'Aberto'), 0) AS open,
@@ -9,16 +15,22 @@ def get_summary(cursor):
             COALESCE(SUM(status = 'Revogado'), 0) AS revoked,
             COALESCE(SUM(status = 'Finalizado'), 0) AS finished
         FROM licitacoes
+        {where_clause}
     """
 
-    cursor.execute(sql)
-
+    cursor.execute(sql, params)
     return cursor.fetchone()
 
 
-def get_latest_biddings(cursor):
+def get_latest_biddings(cursor, user_id: int = None):
+    where_clause = ""
+    params = []
 
-    sql = """
+    if user_id is not None and user_id != 0:
+        where_clause = "WHERE l.usuario_id = %s"
+        params.append(user_id)
+
+    sql = f"""
         SELECT
             l.id,
             l.numero,
@@ -33,10 +45,10 @@ def get_latest_biddings(cursor):
         FROM licitacoes l
         INNER JOIN secretarias s
             ON s.id = l.secretaria_id
+        {where_clause}
         ORDER BY l.criado_em DESC
         LIMIT 10
     """
 
-    cursor.execute(sql)
-
+    cursor.execute(sql, params)
     return cursor.fetchall()

@@ -30,7 +30,7 @@ def _raise_duplicate_bidding_error(error):
         )
 
 
-def list_all_biddings(data: GetAllBiddings):
+def list_all_biddings(data: GetAllBiddings, user_id: int = None):
 
     filters = {
         "number": data.number,
@@ -49,8 +49,11 @@ def list_all_biddings(data: GetAllBiddings):
     
     cursor = connection.cursor(dictionary=True)
     try:
-        items = bidding_repo.find_all(cursor, filters, pagination)
-        total = bidding_repo.count_all(cursor, filters)
+        # Se for um visitante (ID 0), não filtramos por usuário para ele ver o sistema
+        filter_user_id = user_id if user_id != 0 else None
+        
+        items = bidding_repo.find_all(cursor, filters, pagination, user_id=filter_user_id)
+        total = bidding_repo.count_all(cursor, filters, user_id=filter_user_id)
         
         return {
             "items": items,
@@ -63,14 +66,15 @@ def list_all_biddings(data: GetAllBiddings):
     finally:
         close_resources(cursor, connection)
 
-def get_bidding_details(bidding_id: int):
+def get_bidding_details(bidding_id: int, user_id: int = None):
     connection = get_connection()
     if not connection:
         raise HTTPException(status_code=500, detail="Database connection error")
     
     cursor = connection.cursor(dictionary=True)
     try:
-        bidding = bidding_repo.find_by_id(bidding_id, cursor)
+        filter_user_id = user_id if user_id != 0 else None
+        bidding = bidding_repo.find_by_id(bidding_id, cursor, user_id=filter_user_id)
         if not bidding:
             raise HTTPException(status_code=404, detail="Bidding not found")
 
@@ -110,7 +114,7 @@ def create_new_bidding(data: BiddingCreate):
     finally:
         close_resources(cursor, connection)
 
-def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
+def update_existing_bidding(bidding_id: int, data: BiddingUpdate, user_id: int = None):
     connection = get_connection()
     if not connection:
         raise HTTPException(status_code=500, detail="Database connection error")
@@ -119,7 +123,9 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
     try:
         bidding_repo.ensure_status_enum_supports_waiting(cursor)
         bidding_repo.ensure_unique_constraint_includes_type(cursor)
-        bidding = bidding_repo.find_by_id(bidding_id, cursor)
+        
+        filter_user_id = user_id if user_id != 0 else None
+        bidding = bidding_repo.find_by_id(bidding_id, cursor, user_id=filter_user_id)
         if not bidding:
             raise HTTPException(status_code=404, detail="Bidding not found")
 
@@ -156,9 +162,9 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
         if not fields:
             raise HTTPException(status_code=400, detail="No valid fields to update")
 
-        bidding_repo.update(bidding_id, fields, values, cursor)
+        bidding_repo.update(bidding_id, fields, values, cursor, user_id=filter_user_id)
         connection.commit()
-        return bidding_repo.find_by_id(bidding_id, cursor)
+        return bidding_repo.find_by_id(bidding_id, cursor, user_id=filter_user_id)
     except HTTPException:
         if connection:
             connection.rollback()
@@ -171,14 +177,15 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate):
     finally:
         close_resources(cursor, connection)
 
-def delete_bidding_and_files(bidding_id: int):
+def delete_bidding_and_files(bidding_id: int, user_id: int = None):
     connection = get_connection()
     if not connection:
         raise HTTPException(status_code=500, detail="Database connection error")
     
     cursor = connection.cursor(dictionary=True)
     try:
-        bidding = bidding_repo.find_by_id(bidding_id, cursor)
+        filter_user_id = user_id if user_id != 0 else None
+        bidding = bidding_repo.find_by_id(bidding_id, cursor, user_id=filter_user_id)
         if not bidding:
             raise HTTPException(status_code=404, detail="Bidding not found")
 
@@ -186,7 +193,7 @@ def delete_bidding_and_files(bidding_id: int):
         attachment_repo.delete_attachments_by_bidding_id(bidding_id, cursor)
         
         # Deleta licitação
-        bidding_repo.delete(bidding_id, cursor)
+        bidding_repo.delete(bidding_id, cursor, user_id=filter_user_id)
         
         # COMMIT bem-sucedido do banco ANTES de deletar arquivos físicos
         connection.commit()
