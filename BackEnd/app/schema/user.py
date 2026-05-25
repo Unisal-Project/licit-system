@@ -3,12 +3,14 @@ from typing import Optional
 from datetime import datetime
 
 class UserBase(BaseModel):
-    nome: str
+    nome: str = Field(..., min_length=2, max_length=100)
     email: EmailStr
-    perfil: Optional[str] = "fornecedor"
+    perfil: Optional[str] = "visitante"
 
-class UserCreate(UserBase):
-    senha: str = Field(..., min_length=6)
+class UserCreate(BaseModel):
+    nome: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+    senha: str = Field(..., min_length=8, max_length=128)
 
 class UserResponse(UserBase):
     id: int

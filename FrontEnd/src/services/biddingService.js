@@ -9,18 +9,6 @@ import {
 } from "../utils/procurementOptions";
 import { mapApiAttachment } from "./attachmentService";
 
-const configuredDefaultUserId = Number(import.meta.env.VITE_DEFAULT_USER_ID);
-const DEFAULT_USER_ID = Number.isInteger(configuredDefaultUserId) && configuredDefaultUserId > 0
-  ? configuredDefaultUserId
-  : 1;
-
-// Validar que user_id foi fornecido
-if (!Number.isInteger(configuredDefaultUserId) || configuredDefaultUserId <= 0) {
-  console.warn(
-    "VITE_DEFAULT_USER_ID não configurado. Usando usuário sistema padrão ID 1."
-  );
-}
-
 export const PROCUREMENT_STATUS = {
   AGUARDANDO_ABERTURA: "aguardando_abertura",
   ABERTO: "aberto",
@@ -414,10 +402,6 @@ export async function mapFormToApi(formData, { partial = false } = {}) {
     publication_date: toApiDate(formData.dataPublicacao || formData.publicacao),
     opening_date: openingDate,
   };
-
-  if (!partial) {
-    payload.user_id = DEFAULT_USER_ID;
-  }
 
   return Object.fromEntries(
     Object.entries(payload).filter(([, value]) => {

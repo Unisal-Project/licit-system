@@ -20,16 +20,28 @@ pwd_context = CryptContext(schemes=["bcrypt"])
 def hash_senha(senha: str) -> str:
     return pwd_context.hash(senha)
 
-def verificar_senha(senha: str, hash: str) -> bool:
-    return pwd_context.verify(senha, hash)
+def senha_tem_hash_valido(senha_hash: str) -> bool:
+    return bool(senha_hash and pwd_context.identify(senha_hash))
+
+def verificar_senha(senha: str, senha_hash: str) -> bool:
+    if not senha_tem_hash_valido(senha_hash):
+        return False
+
+    try:
+        return pwd_context.verify(senha, senha_hash)
+    except ValueError:
+        return False
 
 def criar_token(user_id: int, email: str, expiracao_minutos: int = None, adicional: dict = None) -> str:
-    tempo_exp = expiracao_minutos or EXPIRACAO
+    tempo_exp = EXPIRACAO if expiracao_minutos is None else expiracao_minutos
     payload = {
         "sub": str(user_id),
         "email": email,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=tempo_exp)
     }
+
+    if tempo_exp > 0:
+        payload["exp"] = datetime.datetime.utcnow() + datetime.timedelta(minutes=tempo_exp)
+
     if adicional:
         payload.update(adicional)
         
@@ -51,9 +63,17 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     return verificar_token(token)
 
 def check_admin(current_user: dict = Depends(get_current_user)):
-    if current_user.get("perfil") != "admin":
+    if current_user.get("perfil") not in {"suporte", "admin"}:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Acesso restrito a administradores"
+        )
+    return current_user
+
+def check_bidding_manager(current_user: dict = Depends(get_current_user)):
+    if current_user.get("perfil") not in {"suporte", "admin", "editor"}:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso restrito a usuários com permissão de edição"
         )
     return current_user

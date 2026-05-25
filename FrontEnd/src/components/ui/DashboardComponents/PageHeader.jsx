@@ -10,7 +10,7 @@ function PageHeader() {
                 </Link>
 
                 <div>
-                    <h1>Dashboard</h1>
+                    <h1>Painel de Controle</h1>
                     <p>Visão geral das licitações</p>
                 </div>
             </div>

@@ -144,7 +144,9 @@
 }
 
 .users-layout {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .users-card {
@@ -199,6 +201,13 @@
   border-collapse: collapse;
 }
 
+.users-table-message {
+  margin: 0;
+  padding: 18px 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
 .users-table th {
   padding: 0 14px 12px;
   color: var(--text-secondary);
@@ -243,6 +252,11 @@
   font-weight: 800;
 }
 
+.role-support {
+  background: rgba(126, 34, 206, 0.14);
+  color: #6b21a8;
+}
+
 .role-admin {
   background: rgba(30, 58, 138, 0.14);
   color: var(--primary);
@@ -278,6 +292,214 @@
 .users-save-action {
   background: rgba(37, 99, 235, 0.12);
   color: var(--secondary);
+}
+
+.users-delete-action {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.users-delete-action:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.users-row-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.users-save-action:hover {
+  background: rgba(37, 99, 235, 0.2);
+}
+
+.users-inactive-card {
+  padding: 0;
+  overflow: hidden;
+  opacity: 0.88;
+}
+
+.users-inactive-toggle {
+  width: 100%;
+  min-height: 64px;
+  padding: 16px 20px;
+  border: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.users-inactive-toggle div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.users-inactive-toggle strong {
+  font-size: 15px;
+}
+
+.users-inactive-toggle span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.users-inactive-chevron {
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.users-inactive-chevron.open {
+  transform: rotate(180deg);
+}
+
+.users-inactive-list {
+  padding: 0 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.users-inactive-item {
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid rgba(156, 163, 175, 0.24);
+  border-radius: 8px;
+  background: var(--bg-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.users-inactive-item div {
+  min-width: 0;
+}
+
+.users-inactive-item strong,
+.users-inactive-item span {
+  display: block;
+}
+
+.users-inactive-item strong {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.users-inactive-item span {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.users-inactive-status {
+  flex-shrink: 0;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(156, 163, 175, 0.22);
+  color: var(--text-primary) !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px !important;
+  font-weight: 800;
+}
+
+.users-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(6px);
+}
+
+.users-delete-modal {
+  width: min(440px, 100%);
+  padding: 26px;
+  border: 1px solid rgba(156, 163, 175, 0.24);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.34);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: modal-soft-enter 0.18s ease both;
+}
+
+.users-delete-modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: var(--danger);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.users-delete-modal-content h2 {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.users-delete-modal-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.users-delete-modal-content strong {
+  color: var(--text-primary);
+}
+
+.users-delete-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.users-delete-modal-actions button {
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.users-modal-cancel {
+  border: 1px solid rgba(156, 163, 175, 0.75);
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+.users-modal-confirm {
+  border: 0;
+  background: var(--danger);
+  color: var(--bg);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.users-delete-modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 @media (max-width: 1440px) {

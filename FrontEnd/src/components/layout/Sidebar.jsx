@@ -1,13 +1,20 @@
 import style from './Sidebar.module.css';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { canManageRemoteAccess, canManageUsers, getCurrentUserRole } from '../../utils/permissions';
+import { canAccessSettings, canManageRemoteAccess, canManageUsers, getCurrentUserRole } from '../../utils/permissions';
+import { logout } from '../../services/authService';
 
 const SIDEBAR_ACTIVE_PATH_KEY = 'licitSysSidebarActivePath';
 
 function Sidebar() {
     const location = useLocation();
+    const navigate = useNavigate();
     const currentRole = getCurrentUserRole();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login', { replace: true });
+    };
 
     const navItems = [
         {
@@ -43,7 +50,7 @@ function Sidebar() {
             title: 'Configurações',
             icon: 'bi bi-gear-fill',
             isActive: location.pathname === '/settings',
-            canShow: true,
+            canShow: canAccessSettings(currentRole),
         },
     ].filter((item) => item.canShow);
 
@@ -90,10 +97,16 @@ function Sidebar() {
                     </NavLink>
                 ))}
 
-                <div className={style.iconExit}>
+                <button
+                    type="button"
+                    className={style.iconExit}
+                    title="Sair"
+                    aria-label="Sair do sistema"
+                    onClick={handleLogout}
+                >
                     <div className={style.exitIndicator}></div>
                     <i className="bi bi-box-arrow-right"></i>
-                </div>
+                </button>
             </div>
         </div>
     );

@@ -16,7 +16,7 @@ class GetAllBiddings(BaseModel):
     search: Optional[str] = None
 
 class BiddingCreate(BaseModel):
-    user_id: int
+    user_id: Optional[int] = None
     department_id: int
     category_id: int
 

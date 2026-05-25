@@ -1,10 +1,12 @@
 import { Plus, Link2} from "lucide-react"
 import { useNavigate} from "react-router-dom";
-import { canManageProcurements, getCurrentUserRole } from "../../../utils/permissions";
+import { canManageProcurements, canManageRemoteAccess, getCurrentUserRole } from "../../../utils/permissions";
 
 function FooterBar() {
     const navigate = useNavigate();
-    const canUseActions = canManageProcurements(getCurrentUserRole());
+    const currentRole = getCurrentUserRole();
+    const canUseActions = canManageProcurements(currentRole);
+    const canGenerateAccess = canManageRemoteAccess(currentRole);
 
     if (!canUseActions) {
         return null;
@@ -22,10 +24,12 @@ function FooterBar() {
                     Nova Licitação
                 </button>
 
-                <button className="btn-acao" onClick={() => navigate("/remote-access")}>
-                    <Link2 size={20} />
-                    Gerar Acesso
-                </button>
+                {canGenerateAccess && (
+                    <button className="btn-acao" onClick={() => navigate("/remote-access")}>
+                        <Link2 size={20} />
+                        Gerar Acesso
+                    </button>
+                )}
             </div>
         </div>
     )

@@ -46,10 +46,13 @@
     align-items: center;
     justify-content: center;
     color: var(--bg);
-    text-decoration: none;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
     font-size: 50px;
     margin-top: auto;
     margin-bottom: 44px;
+    padding: 0;
 }
 
 .iconExit i {

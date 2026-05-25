@@ -1,5 +1,39 @@
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+function isLocalhost(hostname) {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+function getDynamicApiBaseUrl() {
+  if (typeof window === "undefined") {
+    return "http://localhost:8000/v1";
+  }
+
+  const { protocol, hostname } = window.location;
+
+  return `${protocol}//${hostname}:8000/v1`;
+}
+
+function getApiBaseUrl() {
+  const configuredUrl = import.meta.env.VITE_API_BASE_URL;
+
+  if (!configuredUrl) {
+    return getDynamicApiBaseUrl();
+  }
+
+  try {
+    const configuredHostname = new URL(configuredUrl).hostname;
+    const browserHostname = window.location.hostname;
+
+    if (isLocalhost(configuredHostname) && !isLocalhost(browserHostname)) {
+      return getDynamicApiBaseUrl();
+    }
+  } catch {
+    return getDynamicApiBaseUrl();
+  }
+
+  return configuredUrl;
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 const REQUEST_TIMEOUT = 30000; // 30 segundos
 
@@ -25,6 +59,7 @@ function formatErrorMessage(errorData, fallback) {
 
 export async function apiRequest(path, options = {}) {
   const isFormData = options.body instanceof FormData;
+  const token = localStorage.getItem("token");
 
   // Criar AbortController para timeout
   const controller = new AbortController();
@@ -36,6 +71,7 @@ export async function apiRequest(path, options = {}) {
       signal: controller.signal,
       headers: {
         ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
       },
     });

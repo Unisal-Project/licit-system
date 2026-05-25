@@ -1,63 +1,70 @@
 export const USER_ROLES = {
-  ADMIN: "ADM",
-  EDITOR: "Editor",
-  VIEWER: "Visualizador",
+  SUPPORT: "suporte",
+  ADMIN: "admin",
+  EDITOR: "editor",
+  VISITOR: "visitante",
 };
 
 export const ROLE_OPTIONS = [
   {
+    value: USER_ROLES.SUPPORT,
+    label: "Suporte",
+    description: "Acesso tecnico total, incluindo informacoes de outros usuarios.",
+  },
+  {
     value: USER_ROLES.ADMIN,
     label: "ADM",
-    description: "Acesso total, incluindo gerenciamento de usuarios.",
+    description: "Gerencia o sistema e usuarios, sem acesso tecnico a dados privados.",
   },
   {
     value: USER_ROLES.EDITOR,
     label: "Editor",
-    description: "Pode criar, editar, excluir licitacoes e gerar acesso remoto.",
+    description: "Cria, edita e exclui licitacoes, sem gerenciar acessos ou usuarios.",
   },
   {
-    value: USER_ROLES.VIEWER,
-    label: "Visualizador",
+    value: USER_ROLES.VISITOR,
+    label: "Visitante",
     description: "Pode apenas visualizar dashboard, lista e detalhes.",
   },
 ];
 
-export const MOCK_SYSTEM_USERS = [
-  {
-    id: 1,
-    name: "Pedro Administrador",
-    email: "pedro@licit.local",
-    role: USER_ROLES.ADMIN,
-    status: "Ativo",
-  },
-  {
-    id: 2,
-    name: "Maria Silva",
-    email: "maria@licit.local",
-    role: USER_ROLES.VIEWER,
-    status: "Cadastrado",
-  },
-  {
-    id: 3,
-    name: "Joao Santos",
-    email: "joao@licit.local",
-    role: USER_ROLES.VIEWER,
-    status: "Cadastrado",
-  },
-];
 
 const CURRENT_ROLE_KEY = "licit-system-current-role";
 const SYSTEM_USERS_KEY = "licit-system-users";
+
+const LEGACY_ROLE_MAP = {
+  suporte: USER_ROLES.SUPPORT,
+  ADM: USER_ROLES.ADMIN,
+  Admin: USER_ROLES.ADMIN,
+  admin: USER_ROLES.ADMIN,
+  Editor: USER_ROLES.EDITOR,
+  editor: USER_ROLES.EDITOR,
+  Visualizador: USER_ROLES.VISITOR,
+  visualizacao: USER_ROLES.VISITOR,
+  fornecedor: USER_ROLES.VISITOR,
+  visitante: USER_ROLES.VISITOR,
+};
 
 const canUseLocalStorage = () =>
   typeof window !== "undefined" && Boolean(window.localStorage);
 
 export function getCurrentUserRole() {
   if (!canUseLocalStorage()) {
-    return USER_ROLES.ADMIN;
+    return USER_ROLES.VISITOR;
   }
 
-  return window.localStorage.getItem(CURRENT_ROLE_KEY) || USER_ROLES.ADMIN;
+  try {
+    const currentUser = JSON.parse(window.localStorage.getItem("user"));
+    const userRole = currentUser?.perfil || currentUser?.role;
+
+    if (userRole) {
+      return LEGACY_ROLE_MAP[userRole] || userRole;
+    }
+  } catch {
+    // Ignora dados locais corrompidos e cai para o papel salvo abaixo.
+  }
+
+  return USER_ROLES.VISITOR;
 }
 
 export function setCurrentUserRole(role) {
@@ -70,31 +77,7 @@ export function setCurrentUserRole(role) {
 }
 
 export function getStoredUsers() {
-  if (!canUseLocalStorage()) {
-    return MOCK_SYSTEM_USERS;
-  }
-
-  const storedUsers = window.localStorage.getItem(SYSTEM_USERS_KEY);
-
-  if (!storedUsers) {
-    window.localStorage.setItem(
-      SYSTEM_USERS_KEY,
-      JSON.stringify(MOCK_SYSTEM_USERS)
-    );
-
-    return MOCK_SYSTEM_USERS;
-  }
-
-  try {
-    return JSON.parse(storedUsers);
-  } catch {
-    window.localStorage.setItem(
-      SYSTEM_USERS_KEY,
-      JSON.stringify(MOCK_SYSTEM_USERS)
-    );
-
-    return MOCK_SYSTEM_USERS;
-  }
+  return [];
 }
 
 export function saveStoredUsers(users) {
@@ -106,19 +89,35 @@ export function saveStoredUsers(users) {
 }
 
 export function isAdmin(role = getCurrentUserRole()) {
-  return role === USER_ROLES.ADMIN;
+  return role === USER_ROLES.SUPPORT || role === USER_ROLES.ADMIN;
+}
+
+export function isSupport(role = getCurrentUserRole()) {
+  return role === USER_ROLES.SUPPORT;
 }
 
 export function canManageProcurements(role = getCurrentUserRole()) {
-  return role === USER_ROLES.ADMIN || role === USER_ROLES.EDITOR;
+  return (
+    role === USER_ROLES.SUPPORT ||
+    role === USER_ROLES.ADMIN ||
+    role === USER_ROLES.EDITOR
+  );
 }
 
 export function canManageRemoteAccess(role = getCurrentUserRole()) {
-  return canManageProcurements(role);
+  return isAdmin(role);
 }
 
 export function canManageUsers(role = getCurrentUserRole()) {
   return isAdmin(role);
+}
+
+export function canAccessSettings(role = getCurrentUserRole()) {
+  return role !== USER_ROLES.VISITOR;
+}
+
+export function canViewUserPrivateInfo(role = getCurrentUserRole()) {
+  return isSupport(role);
 }
 
 export function useRoleChangeListener(callback) {

@@ -95,6 +95,7 @@ def create_new_bidding(data: BiddingCreate):
     cursor = connection.cursor(dictionary=True)
     try:
         bidding_repo.ensure_status_enum_supports_waiting(cursor)
+        bidding_repo.ensure_type_enum_supports_all(cursor)
         bidding_repo.ensure_unique_constraint_includes_type(cursor)
 
         bidding_repo.ensure_user_exists(data.user_id, cursor)
@@ -122,6 +123,7 @@ def update_existing_bidding(bidding_id: int, data: BiddingUpdate, user_id: int =
     cursor = connection.cursor(dictionary=True)
     try:
         bidding_repo.ensure_status_enum_supports_waiting(cursor)
+        bidding_repo.ensure_type_enum_supports_all(cursor)
         bidding_repo.ensure_unique_constraint_includes_type(cursor)
         
         filter_user_id = user_id if user_id != 0 else None

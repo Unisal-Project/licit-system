@@ -17,6 +17,24 @@ def ensure_status_enum_supports_waiting(cursor):
     )
 
 
+def ensure_type_enum_supports_all(cursor):
+    cursor.execute(
+        """
+        ALTER TABLE licitacoes
+        MODIFY tipo enum(
+            'Pregão Eletrônico',
+            'Concorrência Pública',
+            'Chamada Pública',
+            'Concorrência Presencial',
+            'Credenciamento',
+            'Dispensa Eletrônica',
+            'Inexigibilidade',
+            'Pregão Presencial'
+        ) NOT NULL
+        """
+    )
+
+
 def ensure_unique_constraint_includes_type(cursor):
     cursor.execute(
         """
@@ -61,7 +79,7 @@ def ensure_user_exists(user_id: int, cursor):
             "Usuário Sistema",
             "sistema@licitsystem.local",
             "sem-autenticacao-local",
-            "admin",
+            "suporte",
             1,
         ),
     )

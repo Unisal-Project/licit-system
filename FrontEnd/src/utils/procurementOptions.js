@@ -10,8 +10,6 @@ export const PROCUREMENT_TYPES = [
 ];
 
 export const STATUS_OPTIONS = [
-  {label:"Aguardando Abertura", value: "aguardando_abertura"},
-  {label:"Aberto", value: "aberto"},
   {label:"Em Andamento", value: "em_andamento"},
   {label:"Suspenso", value: "suspenso"},
   {label:"Revogado", value: "revogado"},

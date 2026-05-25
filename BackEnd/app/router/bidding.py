@@ -2,7 +2,7 @@ from fastapi import APIRouter, Query, Depends
 from typing import Optional
 from app.schema.bidding import BiddingCreate, BiddingUpdate, GetAllBiddings
 from app.service import bidding as bidding_service
-from app.utils.auth import get_current_user
+from app.utils.auth import check_bidding_manager, get_current_user
 
 
 router = APIRouter(
@@ -32,26 +32,22 @@ def get_all_biddings(
         status=status,
         search=search
     )
-    user_id = int(current_user["sub"]) if current_user else None
-    return bidding_service.list_all_biddings(data, user_id=user_id)
+    return bidding_service.list_all_biddings(data, user_id=None)
 
 @router.get("/{bidding_id}")
 def get_bidding_by_id(bidding_id: int, current_user: Optional[dict] = Depends(get_current_user)):
-    user_id = int(current_user["sub"]) if current_user else None
-    return bidding_service.get_bidding_details(bidding_id, user_id=user_id)
+    return bidding_service.get_bidding_details(bidding_id, user_id=None)
 
 @router.post("/")
-def create_bidding(data: BiddingCreate, current_user: dict = Depends(get_current_user)):
+def create_bidding(data: BiddingCreate, current_user: dict = Depends(check_bidding_manager)):
     # Sobrescreve o user_id do corpo pelo ID real do token para segurança
     data.user_id = int(current_user["sub"])
     return bidding_service.create_new_bidding(data)
 
 @router.patch("/{bidding_id}")
-def update_bidding(bidding_id: int, data: BiddingUpdate, current_user: dict = Depends(get_current_user)):
-    user_id = int(current_user["sub"])
-    return bidding_service.update_existing_bidding(bidding_id, data, user_id=user_id)
+def update_bidding(bidding_id: int, data: BiddingUpdate, current_user: dict = Depends(check_bidding_manager)):
+    return bidding_service.update_existing_bidding(bidding_id, data, user_id=None)
 
 @router.delete("/{bidding_id}")
-def delete_bidding(bidding_id: int, current_user: dict = Depends(get_current_user)):
-    user_id = int(current_user["sub"])
-    return bidding_service.delete_bidding_and_files(bidding_id, user_id=user_id)
+def delete_bidding(bidding_id: int, current_user: dict = Depends(check_bidding_manager)):
+    return bidding_service.delete_bidding_and_files(bidding_id, user_id=None)

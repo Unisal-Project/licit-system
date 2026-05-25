@@ -250,6 +250,27 @@
     font-weight: 500;
 }
 
+.credenciais-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--bg-light);
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+.credenciais-box strong {
+    font-size: 12px;
+}
+
+.remote-error {
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 600;
+}
+
 .link-aviso {
     display: flex;
     align-items: center;

@@ -1,26 +1,69 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { User, Lock, Eye, EyeOff } from 'lucide-react'
 import "./Login.css"
 import { logo, male_laptop, name, lighting} from "../../assets/images/images.js"
 import { Button, Input } from "../../components/ui/main"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom"
+import { toast } from "react-toastify"
+import { login, saveAuth } from "../../services/authService"
 
 function Login() {
-    const [cpf, setCpf] = useState("")
+    const [email, setEmail] = useState("")
     const [senha, setSenha] = useState("")
     const [mostrarSenha, setMostrarSenha] = useState(false)
     const [lembrar, setLembrar] = useState(false)
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
 
-    const enviar = (event) => {
-        event.preventDefault()
+    useEffect(() => {
+        const remoteUser = searchParams.get("usuario")
 
-        const dados = {
-            cpf,
-            senha,
-            lembrar
+        if (remoteUser) {
+            setEmail(remoteUser)
         }
 
-        console.log("Login:", dados)
+        const remoteToken = searchParams.get("token")
+
+        if (!remoteToken) {
+            return
+        }
+
+        try {
+            const [, payloadPart] = remoteToken.split(".")
+            const normalizedPayload = payloadPart.replace(/-/g, "+").replace(/_/g, "/")
+            const paddedPayload = normalizedPayload.padEnd(
+                normalizedPayload.length + ((4 - normalizedPayload.length % 4) % 4),
+                "="
+            )
+            const payload = JSON.parse(atob(paddedPayload))
+
+            saveAuth({
+                access_token: remoteToken,
+                user: {
+                    id: Number(payload.sub || 0),
+                    nome: payload.nome || "Acesso remoto",
+                    email: payload.email,
+                    perfil: payload.perfil,
+                    remoto: Boolean(payload.remote),
+                    permanente: Boolean(payload.permanente),
+                },
+            })
+            navigate("/dashboard", { replace: true })
+        } catch {
+            toast.error("Link de acesso inválido.")
+        }
+    }, [navigate, searchParams])
+
+    const enviar = async (event) => {
+        event.preventDefault()
+
+        try {
+            const data = await login(email, senha)
+            saveAuth(data)
+            navigate("/dashboard")
+        } catch (error) {
+            toast.error("Erro ao fazer login: " + error.message)
+        }
     }
 
     return (
@@ -47,9 +90,9 @@ function Login() {
                             className="input-login"
                             type='text'
                             icon={User}
-                            placeholder='CPF'
-                            value={cpf}
-                            onChange={(e) => setCpf(e.target.value)}
+                            placeholder='E-mail ou usuário'
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
 
                         <div className='password-field'>
@@ -81,14 +124,13 @@ function Login() {
                                 Lembrar de mim
                             </label>
 
-                            <a href='#' className='forgot-link'>
+                            <NavLink to="/forgot-password" className='forgot-link'>
                                 Esqueci minha senha
-                            </a>
+                            </NavLink>
                         </div>
 
                         <Button
-                            as={NavLink}
-                            to="/dashboard"
+                            type="submit"
                             className="btn-login"
                         >
                             Entrar

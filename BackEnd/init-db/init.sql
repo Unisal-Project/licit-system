@@ -24,21 +24,27 @@ CREATE TABLE `usuarios` (
                             `id`           int          NOT NULL AUTO_INCREMENT,
                             `nome`         varchar(100) NOT NULL,
                             `email`        varchar(150) NOT NULL,
+                            `usuario_acesso` varchar(100) DEFAULT NULL,
                             `senha`        varchar(255) NOT NULL,
                             `criado_em`    datetime     DEFAULT CURRENT_TIMESTAMP,
                             `atualizado_em` datetime    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             `ultimo_login` datetime     DEFAULT NULL,
-                            `perfil`       enum('admin','gestor','fornecedor','visualizacao') DEFAULT 'fornecedor',
+                            `perfil`       enum('suporte','admin','editor','visitante') DEFAULT 'visitante',
                             `ativo`        tinyint(1)   NOT NULL DEFAULT '1',
+                            `acesso_remoto` tinyint(1) NOT NULL DEFAULT '0',
+                            `acesso_expira_em` datetime DEFAULT NULL,
+                            `acesso_permanente` tinyint(1) NOT NULL DEFAULT '0',
                             PRIMARY KEY (`id`),
-                            UNIQUE KEY `uq_usuario_email` (`email`)
+                            UNIQUE KEY `uq_usuario_email` (`email`),
+                            UNIQUE KEY `uq_usuario_acesso` (`usuario_acesso`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `perfil`, `ativo`) VALUES
-    (1, 'Usuário Sistema', 'sistema@licitsystem.local', 'sem-autenticacao-local', 'admin', 1)
+    (1, 'Suporte Tecnico', 'suporte@licitsystem.local', '$2b$12$K68Xd.kkO3LT6ohnIrcEnODJqbCQ/Y5HWTvWVQL2M/yDhEnRI4r.e', 'suporte', 1)
     ON DUPLICATE KEY UPDATE
                          `nome` = VALUES(`nome`),
                          `email` = VALUES(`email`),
+                         `senha` = VALUES(`senha`),
                          `perfil` = VALUES(`perfil`),
                          `ativo` = VALUES(`ativo`);
 
@@ -103,7 +109,7 @@ CREATE TABLE `licitacoes` (
                               `categoria_id`     int            NOT NULL,
                               `numero`           int            NOT NULL,
                               `ano`              int            NOT NULL,
-                              `tipo`             enum('Chamada Pública','Concorrência Pública', 'Concorrência Presencial','Credenciamento', 'Dispensa Eletrônica', 'Inexigibilidade', 'Pregão Eletrônico','Pregão Presencial') NOT NULL,
+                              `tipo`             enum('Pregão Eletrônico','Concorrência Pública','Chamada Pública','Concorrência Presencial','Credenciamento','Dispensa Eletrônica','Inexigibilidade','Pregão Presencial') NOT NULL,
                               `status`           enum('Aguardando Abertura','Aberto','Em Andamento','Suspenso','Revogado','Finalizado') DEFAULT 'Aguardando Abertura',
                               `classificacao`    enum('Global','Item','Lote') DEFAULT 'Global',
                               `objeto`           varchar(300)   DEFAULT NULL,
@@ -169,7 +175,7 @@ CREATE TABLE `convites` (
                             `token`          varchar(100) NOT NULL,
                             `usuario_acesso` varchar(100) NOT NULL,
                             `senha_acesso`   varchar(255) NOT NULL,
-                            `perfil_acesso`  enum('admin','gestor','fornecedor','visualizacao') DEFAULT 'visualizacao',
+                            `perfil_acesso`  enum('suporte','admin','editor','visitante') DEFAULT 'visitante',
                             `validade_dias`  int          DEFAULT '7',
                             `usado`          tinyint(1)   DEFAULT '0',
                             `criado_em`      datetime     DEFAULT CURRENT_TIMESTAMP,
@@ -178,6 +184,25 @@ CREATE TABLE `convites` (
                             UNIQUE KEY `token` (`token`),
                             KEY `usuario_id` (`usuario_id`),
                             CONSTRAINT `convites_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Tabela: password_reset_tokens
+-- (depende de: usuarios)
+DROP TABLE IF EXISTS `password_reset_tokens`;
+CREATE TABLE `password_reset_tokens` (
+                            `id`         int         NOT NULL AUTO_INCREMENT,
+                            `usuario_id` int         NOT NULL,
+                            `token_hash` varchar(64) NOT NULL,
+                            `expira_em`  datetime    NOT NULL,
+                            `usado`      tinyint(1)  NOT NULL DEFAULT '0',
+                            `criado_em`  datetime    DEFAULT CURRENT_TIMESTAMP,
+                            `usado_em`   datetime    DEFAULT NULL,
+                            PRIMARY KEY (`id`),
+                            UNIQUE KEY `uq_password_reset_token_hash` (`token_hash`),
+                            KEY `idx_password_reset_usuario_id` (`usuario_id`),
+                            CONSTRAINT `password_reset_tokens_usuario_fk`
+                                FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`)
+                                ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

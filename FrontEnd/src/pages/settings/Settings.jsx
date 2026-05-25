@@ -1,18 +1,20 @@
-import { useState } from "react";
-import { ArrowLeft, Camera, Home, Lock, Mail, Pencil, Save, User, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Home, Lock, Mail, Pencil, Save, User, X } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import Button from "../../components/ui/Button/Button";
 import Input from "../../components/ui/Input/Input";
+import { getCurrentUserProfile, updateCurrentUserPassword } from "../../services/userService";
 import "./Settings.css";
 
-const MOCK_PROFILE_FROM_DATABASE = {
+const EMPTY_PROFILE = {
   nome: "",
-  cpf: "",
   email: "",
+  perfil: "",
 };
 
 const INITIAL_PASSWORD_FORM = {
+  senhaAtual: "",
   novaSenha: "",
   confirmarSenha: "",
 };
@@ -64,13 +66,14 @@ function SettingsCard({ icon: Icon, title, subtitle, action, children }) {
   );
 }
 
-function SettingsField({ label, icon: Icon, type = "text", value, placeholder, disabled, onChange }) {
+function SettingsField({ label, icon: Icon, type = "text", value, placeholder, disabled, isPassword = false, onChange }) {
   return (
     <label className="settings-field">
       <span>{label}</span>
       <Input
         icon={Icon}
         type={type}
+        isPassword={isPassword}
         value={value}
         placeholder={placeholder}
         disabled={disabled}
@@ -81,10 +84,49 @@ function SettingsField({ label, icon: Icon, type = "text", value, placeholder, d
 }
 
 function Settings() {
-  const [profile, setProfile] = useState(MOCK_PROFILE_FROM_DATABASE);
-  const [draftProfile, setDraftProfile] = useState(MOCK_PROFILE_FROM_DATABASE);
+  const [profile, setProfile] = useState(EMPTY_PROFILE);
+  const [draftProfile, setDraftProfile] = useState(EMPTY_PROFILE);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [passwordForm, setPasswordForm] = useState(INITIAL_PASSWORD_FORM);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [passwordFeedback, setPasswordFeedback] = useState({ type: "", message: "" });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProfile() {
+      try {
+        setIsLoadingProfile(true);
+        const user = await getCurrentUserProfile();
+        const nextProfile = {
+          nome: user.nome || "",
+          email: user.email || "",
+          perfil: user.perfil || "",
+        };
+
+        if (!isMounted) return;
+
+        setProfile(nextProfile);
+        setDraftProfile(nextProfile);
+        setProfileError("");
+      } catch (error) {
+        if (!isMounted) return;
+        setProfileError(error.message);
+      } finally {
+        if (isMounted) {
+          setIsLoadingProfile(false);
+        }
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const updateDraftProfile = (field, value) => {
     setDraftProfile((currentProfile) => ({
@@ -116,10 +158,37 @@ function Settings() {
     setIsEditingProfile(false);
   };
 
-  const changePassword = () => {
-    // Futuro backend: await resetUserPassword(passwordForm)
-    console.log("Redefinir senha:", passwordForm);
-    setPasswordForm(INITIAL_PASSWORD_FORM);
+  const changePassword = async () => {
+    setPasswordFeedback({ type: "", message: "" });
+
+    if (!passwordForm.senhaAtual || !passwordForm.novaSenha || !passwordForm.confirmarSenha) {
+      setPasswordFeedback({ type: "error", message: "Preencha todos os campos de senha." });
+      return;
+    }
+
+    if (passwordForm.novaSenha.length < 8) {
+      setPasswordFeedback({ type: "error", message: "A nova senha precisa ter pelo menos 8 caracteres." });
+      return;
+    }
+
+    if (passwordForm.novaSenha !== passwordForm.confirmarSenha) {
+      setPasswordFeedback({ type: "error", message: "A confirmação não confere com a nova senha." });
+      return;
+    }
+
+    try {
+      setIsChangingPassword(true);
+      await updateCurrentUserPassword({
+        senhaAtual: passwordForm.senhaAtual,
+        novaSenha: passwordForm.novaSenha,
+      });
+      setPasswordForm(INITIAL_PASSWORD_FORM);
+      setPasswordFeedback({ type: "success", message: "Senha alterada com sucesso." });
+    } catch (error) {
+      setPasswordFeedback({ type: "error", message: error.message });
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   return (
@@ -137,12 +206,11 @@ function Settings() {
               </div>
             </div>
 
-            <h2>{profile.nome}</h2>
-            <p>Perfil do usuário</p>
+            <h2>{isLoadingProfile ? "Carregando..." : profile.nome}</h2>
+            <p>{profile.perfil || "Perfil do usuário"}</p>
 
             <div className="settings-profile-meta">
               <span>{profile.email}</span>
-              <span>{profile.cpf}</span>
             </div>
           </aside>
 
@@ -173,6 +241,10 @@ function Settings() {
                 )
               }
             >
+              {profileError && (
+                <p className="settings-feedback">{profileError}</p>
+              )}
+
               <div className="settings-field-grid">
                 <label className="settings-field settings-field-full">
                   <span>Nome</span>
@@ -184,15 +256,6 @@ function Settings() {
                     onChange={(event) => updateDraftProfile("nome", event.target.value)}
                   />
                 </label>
-
-                <SettingsField
-                  label="CPF"
-                  icon={User}
-                  value={draftProfile.cpf}
-                  placeholder="000.000.000-00"
-                  disabled={!isEditingProfile}
-                  onChange={(value) => updateDraftProfile("cpf", value)}
-                />
 
                 <SettingsField
                   label="E-mail"
@@ -225,9 +288,18 @@ function Settings() {
             >
               <div className="settings-field-grid">
                 <SettingsField
+                  label="Senha atual"
+                  icon={Lock}
+                  isPassword
+                  value={passwordForm.senhaAtual}
+                  placeholder="Digite sua senha atual"
+                  onChange={(value) => updatePasswordForm("senhaAtual", value)}
+                />
+
+                <SettingsField
                   label="Nova senha"
                   icon={Lock}
-                  type="password"
+                  isPassword
                   value={passwordForm.novaSenha}
                   placeholder="Digite a nova senha"
                   onChange={(value) => updatePasswordForm("novaSenha", value)}
@@ -237,7 +309,7 @@ function Settings() {
                   <span>Confirmar nova senha</span>
                   <Input
                     icon={Lock}
-                    type="password"
+                    isPassword
                     value={passwordForm.confirmarSenha}
                     placeholder="Confirme a nova senha"
                     onChange={(event) => updatePasswordForm("confirmarSenha", event.target.value)}
@@ -245,10 +317,23 @@ function Settings() {
                 </label>
               </div>
 
+              <NavLink
+                to={`/forgot-password?email=${encodeURIComponent(profile.email || draftProfile.email || "")}`}
+                className="settings-forgot-password-link"
+              >
+                Não sei minha senha atual
+              </NavLink>
+
+              {passwordFeedback.message && (
+                <p className={`settings-feedback settings-feedback-${passwordFeedback.type}`}>
+                  {passwordFeedback.message}
+                </p>
+              )}
+
               <footer className="settings-actions">
-                <Button variant="primary" onClick={changePassword}>
+                <Button variant="primary" onClick={changePassword} disabled={isChangingPassword}>
                   <Save size={18} />
-                  Redefinir senha
+                  {isChangingPassword ? "Alterando..." : "Redefinir senha"}
                 </Button>
               </footer>
             </SettingsCard>

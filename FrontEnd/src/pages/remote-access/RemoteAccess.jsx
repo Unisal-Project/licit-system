@@ -8,18 +8,22 @@ import { Home, ArrowLeft, Copy, AlertCircle, User, Lock, Link } from "lucide-rea
 import { useNavigate } from 'react-router-dom';
 import { customSelectStyles } from "../../components/shared/styleSelect";
 import { USER_ROLES } from "../../utils/permissions";
+import { generateRemoteAccess } from "../../services/authService";
 import "./RemoteAccess.css"
 
 const PERFIL_OPTIONS = [
-  { value: USER_ROLES.VIEWER, label: "Visualizador" },
+  { value: USER_ROLES.VISITOR, label: "Visitante" },
   { value: USER_ROLES.EDITOR, label: "Editor" },
 ];
 
 const VALIDADE_OPTIONS = [
-  { value: "7 dias", label: "7 dias" },
-  { value: "15 dias", label: "15 dias" },
-  { value: "30 dias", label: "30 dias" },
+  { value: "7", label: "7 dias" },
+  { value: "15", label: "15 dias" },
+  { value: "30", label: "30 dias" },
+  { value: "permanente", label: "Permanente" },
 ];
+
+const VISITOR_VALIDITY_OPTION = { value: "24h", label: "24 horas" };
 
 const getSelectedOption = (options, value) => {
   return options.find((option) => option.value === value) || null;
@@ -61,21 +65,72 @@ function RemoteAccess() {
   const [dados, setDados] = useState({
     usuario: "",
     senha: "",
-    perfil: "",
-    validade: "",
+    perfil: USER_ROLES.VISITOR,
+    validade: "24h",
     mensagem: "",
   })
   const [linkGerado, setLinkGerado] = useState("")
+  const [credenciais, setCredenciais] = useState(null)
   const [copiado, setCopiado] = useState(false)
+  const [erro, setErro] = useState("")
+  const [expiracaoTexto, setExpiracaoTexto] = useState("")
+  const [gerando, setGerando] = useState(false)
 
   const handleChange = (campo, valor) => {
-    setDados(prev => ({ ...prev, [campo]: valor }))
+    setDados(prev => {
+      if (campo === "perfil" && valor === USER_ROLES.VISITOR) {
+        return { ...prev, perfil: valor, validade: "24h" }
+      }
+
+      if (campo === "perfil" && valor === USER_ROLES.EDITOR) {
+        return { ...prev, perfil: valor, validade: "7" }
+      }
+
+      return { ...prev, [campo]: valor }
+    })
   }
 
-  const handleGerarLink = () => {
-    const link = ``
-    setLinkGerado(link)
-    console.log("Link gerado:", link)
+  const handleGerarLink = async () => {
+    setErro("")
+    setLinkGerado("")
+    setCredenciais(null)
+    setExpiracaoTexto("")
+
+    if (!dados.usuario.trim() || !dados.senha.trim()) {
+      setErro("Informe o usuário e a senha de acesso.")
+      return
+    }
+
+    try {
+      setGerando(true)
+      const isEditor = dados.perfil === USER_ROLES.EDITOR
+      const permanente = isEditor && dados.validade === "permanente"
+      const response = await generateRemoteAccess({
+        perfil: dados.perfil,
+        usuario: dados.usuario,
+        senha: dados.senha,
+        permanente,
+        validade_dias: isEditor && !permanente ? Number(dados.validade || 7) : undefined,
+      })
+
+      setLinkGerado(response.link_acesso)
+      setCredenciais({
+        usuario: response.usuario,
+        senha: response.senha,
+        perfil: response.perfil,
+      })
+      setExpiracaoTexto(
+        response.permanente
+          ? "Acesso permanente"
+          : response.expira_em
+            ? `Expira em ${new Date(response.expira_em).toLocaleString("pt-BR")}`
+            : "Expiração não informada"
+      )
+    } catch (error) {
+      setErro("Erro ao gerar acesso remoto: " + error.message)
+    } finally {
+      setGerando(false)
+    }
   }
 
   const handleCopiar = () => {
@@ -99,7 +154,7 @@ function RemoteAccess() {
               </div>
               <div>
                 <h2>Gerar link de Acesso</h2>
-                <p>Crie um convite para que o prefeito ou outra pessoa possa acessar o sistema</p>
+                <p>Crie um link com permissões temporárias para acessar o sistema</p>
               </div>
             </div>
 
@@ -109,7 +164,7 @@ function RemoteAccess() {
                 <Input
                   className="input-user"
                   icon={User}
-                  placeholder="Nome"
+                  placeholder="Usuário"
                   value={dados.usuario}
                   onChange={(e) => handleChange('usuario', e.target.value)}
                 />
@@ -120,7 +175,7 @@ function RemoteAccess() {
                   className="input-senha"
                   isPassword={true}
                   icon={Lock}
-                  placeholder="••••••••"
+                  placeholder="Senha"
                   value={dados.senha}
                   onChange={(e) => handleChange('senha', e.target.value)}
                 />
@@ -144,18 +199,22 @@ function RemoteAccess() {
                   menuPosition="fixed"
                 />
               </div>
+
               <div className="campo">
                 <label>Validade do Link</label>
                 <Select
                   classNamePrefix="remote-react-select"
-                  options={VALIDADE_OPTIONS}
+                  options={dados.perfil === USER_ROLES.VISITOR ? [VISITOR_VALIDITY_OPTION] : VALIDADE_OPTIONS}
                   placeholder="Selecione"
-                  value={getSelectedOption(VALIDADE_OPTIONS, dados.validade)}
+                  value={dados.perfil === USER_ROLES.VISITOR
+                    ? VISITOR_VALIDITY_OPTION
+                    : getSelectedOption(VALIDADE_OPTIONS, dados.validade)}
                   onChange={(selectedOption) =>
                     handleChange("validade", selectedOption ? selectedOption.value : "")
                   }
                   styles={customSelectStyles}
                   isSearchable={false}
+                  isDisabled={dados.perfil === USER_ROLES.VISITOR}
                   menuPortalTarget={selectMenuPortalTarget}
                   menuPosition="fixed"
                 />
@@ -172,10 +231,12 @@ function RemoteAccess() {
               />
             </div>
 
+            {erro && <p className="remote-error">{erro}</p>}
+
             <div className="acesso-botoes">
-              <Button variant="primary" onClick={handleGerarLink} className="btn-gerar">
+              <Button variant="primary" onClick={handleGerarLink} className="btn-gerar" disabled={gerando}>
                 <Link size={18} />
-                Gerar Link de Acesso
+                {gerando ? "Gerando..." : "Gerar Link de Acesso"}
               </Button>
             </div>
           </div>
@@ -197,9 +258,17 @@ function RemoteAccess() {
                 </button>
               </div>
               {copiado && <span className="copiado-msg">Copiado!</span>}
+              {credenciais && (
+                <div className="credenciais-box">
+                  <strong>Dados para enviar:</strong>
+                  <span>Usuário: {credenciais.usuario}</span>
+                  <span>Senha: {credenciais.senha}</span>
+                  <span>Perfil: {credenciais.perfil}</span>
+                </div>
+              )}
               <div className="link-aviso">
                 <AlertCircle size={14} />
-                <span>O link expira em 7 dias ou após o primeiro acesso</span>
+                <span>{expiracaoTexto || "Visitante expira em 24 horas. Editor pode ter validade personalizada ou permanente."}</span>
               </div>
             </div>
 
@@ -207,17 +276,17 @@ function RemoteAccess() {
               <p className="como-titulo">Como funciona:</p>
               <div className="passo">
                 <div className="passo-numero">1</div>
-                <p>Você gera e envia o link de convite</p>
+                <p>Você cria o usuário e envia o link de acesso</p>
               </div>
               <div className="passo-linha"></div>
               <div className="passo">
                 <div className="passo-numero">2</div>
-                <p>O novo usuario recebe, cria a conta e ativa o acesso</p>
+                <p>A pessoa abre o link e entra com usuário e senha</p>
               </div>
               <div className="passo-linha"></div>
               <div className="passo">
                 <div className="passo-numero">3</div>
-                <p>O usuário fica salvo na lista para próximos acessos</p>
+                <p>As permissões vêm do perfil definido no cadastro</p>
               </div>
             </div>
           </div>

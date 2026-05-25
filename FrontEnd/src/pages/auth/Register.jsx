@@ -1,20 +1,22 @@
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { Button, Input } from "../../components/ui/main";
 import { lighting, logo, male_laptop, name } from "../../assets/images/images.js";
+import { register } from "../../services/authService";
 import "./Register.css";
 
 function Register() {
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
-    cpf: "",
     senha: "",
     confirmarSenha: "",
   });
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
+  const navigate = useNavigate();
 
   const updateField = (field, value) => {
     setFormData((currentData) => ({
@@ -23,10 +25,21 @@ function Register() {
     }));
   };
 
-  const enviar = (event) => {
+  const enviar = async (event) => {
     event.preventDefault();
 
-    console.log("Cadastro:", formData);
+    if (formData.senha !== formData.confirmarSenha) {
+      toast.error("As senhas não conferem.");
+      return;
+    }
+
+    try {
+      await register(formData);
+      toast.success("Conta criada com sucesso.");
+      navigate("/login");
+    } catch (error) {
+      toast.error("Erro ao criar conta: " + error.message);
+    }
   };
 
   return (
@@ -56,7 +69,6 @@ function Register() {
               onChange={(event) => updateField("nome", event.target.value)}
             />
 
-            <div className="register-fields-row">
               <Input
                 className="register-input"
                 icon={Mail}
@@ -65,15 +77,6 @@ function Register() {
                 value={formData.email}
                 onChange={(event) => updateField("email", event.target.value)}
               />
-
-              <Input
-                className="register-input"
-                icon={User}
-                placeholder="CPF"
-                value={formData.cpf}
-                onChange={(event) => updateField("cpf", event.target.value)}
-              />
-            </div>
 
             <div className="register-fields-row">
               <div className="register-password-field">

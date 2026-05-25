@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register.jsx";
+import ForgotPassword from "../pages/auth/ForgotPassword.jsx";
+import ResetPassword from "../pages/auth/ResetPassword.jsx";
 
 import Dashboard from "../pages/dashboard/Dashboard.jsx";
 
@@ -21,6 +23,7 @@ import {
     canManageProcurements,
     canManageRemoteAccess,
     canManageUsers,
+    canAccessSettings,
     getCurrentUserRole,
 } from "../utils/permissions.js";
 
@@ -73,6 +76,16 @@ function PermissionRoute({ children, canAccess, fallback = "/procurements" }) {
     return children;
 }
 
+function ProtectedRoute({ children }) {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return children;
+}
+
 function AppRoutes() {
     return (
         <BrowserRouter>
@@ -81,16 +94,18 @@ function AppRoutes() {
 
                 <Route path="/login" element={<PlatformRoute><Login /></PlatformRoute>} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/dashboard" element={<PlatformRoute><Dashboard /></PlatformRoute>} />
+                <Route path="/forgot-password" element={<PlatformRoute><ForgotPassword /></PlatformRoute>} />
+                <Route path="/reset-password" element={<PlatformRoute><ResetPassword /></PlatformRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><PlatformRoute><Dashboard /></PlatformRoute></ProtectedRoute>} />
 
-                <Route path="/procurements" element={<PlatformRoute><ProcurementList /></PlatformRoute>} />
-                <Route path="/procurements/create" element={<PlatformRoute><PermissionRoute canAccess={canManageProcurements}><CreateProcurements /></PermissionRoute></PlatformRoute>} />
-                <Route path="/procurements/edit/:id" element={<PlatformRoute><PermissionRoute canAccess={canManageProcurements}><EditProcurements /></PermissionRoute></PlatformRoute>} />
-                <Route path="/procurements/:id" element={<PlatformRoute><DetailsProcurements /></PlatformRoute>} />
+                <Route path="/procurements" element={<ProtectedRoute><PlatformRoute><ProcurementList /></PlatformRoute></ProtectedRoute>} />
+                <Route path="/procurements/create" element={<ProtectedRoute><PlatformRoute><PermissionRoute canAccess={canManageProcurements}><CreateProcurements /></PermissionRoute></PlatformRoute></ProtectedRoute>} />
+                <Route path="/procurements/edit/:id" element={<ProtectedRoute><PlatformRoute><PermissionRoute canAccess={canManageProcurements}><EditProcurements /></PermissionRoute></PlatformRoute></ProtectedRoute>} />
+                <Route path="/procurements/:id" element={<ProtectedRoute><PlatformRoute><DetailsProcurements /></PlatformRoute></ProtectedRoute>} />
 
-                <Route path="/remote-access" element={<PlatformRoute><PermissionRoute canAccess={canManageRemoteAccess}><RemoteAccess /></PermissionRoute></PlatformRoute>} />
-                <Route path="/users" element={<PlatformRoute><PermissionRoute canAccess={canManageUsers}><UsersManagement /></PermissionRoute></PlatformRoute>} />
-                <Route path="/settings" element={<PlatformRoute><Settings /></PlatformRoute>} />
+                <Route path="/remote-access" element={<ProtectedRoute><PlatformRoute><PermissionRoute canAccess={canManageRemoteAccess}><RemoteAccess /></PermissionRoute></PlatformRoute></ProtectedRoute>} />
+                <Route path="/users" element={<ProtectedRoute><PlatformRoute><PermissionRoute canAccess={canManageUsers}><UsersManagement /></PermissionRoute></PlatformRoute></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><PlatformRoute><PermissionRoute canAccess={canAccessSettings}><Settings /></PermissionRoute></PlatformRoute></ProtectedRoute>} />
 
                 <Route path="*" element={<Navigate to="/procurements" replace />} />
 

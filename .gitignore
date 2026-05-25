@@ -36,7 +36,7 @@ htmlcov/
 # ========================
 .env
 .env.*
-# Removida a exceção do .env.example conforme pedido
+!.env.example
 
 # ========================
 # Uploads e Arquivos de Usuário (IMPORTANTE)

@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
 
-from app.router import bidding, department, category, attachment, dashboard, auth
+from app.router import bidding, department, category, attachment, dashboard, auth, user
 
 app = FastAPI(
     title="LicitSystem API",
@@ -12,16 +12,23 @@ app = FastAPI(
     version="1.0.0"
 )
 
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",")
+    if origin.strip()
+]
+cors_origin_regex = os.getenv(
+    "CORS_ORIGIN_REGEX",
+    r"https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|[\w.-]+):(?:3000|5173)"
+)
+
 # Configuração de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        os.getenv("FRONTEND_URL", "http://localhost:3000")
-    ],
+    allow_origins=cors_origins,
+    allow_origin_regex=cors_origin_regex,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -35,6 +42,7 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Registro de Rotas
 app.include_router(auth.router, prefix="/v1")
+app.include_router(user.router, prefix="/v1")
 app.include_router(department.router, prefix="/v1")
 app.include_router(category.router, prefix="/v1")
 app.include_router(bidding.router, prefix="/v1")
