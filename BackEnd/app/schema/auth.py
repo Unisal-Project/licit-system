@@ -14,8 +14,6 @@ class ResetPasswordRequest(BaseModel):
     nova_senha: str = Field(..., min_length=8, max_length=128)
 
 class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
     user: dict = None
 
 class VisitorTokenRequest(BaseModel):

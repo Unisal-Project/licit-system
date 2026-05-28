@@ -59,7 +59,6 @@ function formatErrorMessage(errorData, fallback) {
 
 export async function apiRequest(path, options = {}) {
   const isFormData = options.body instanceof FormData;
-  const token = localStorage.getItem("token");
 
   // Criar AbortController para timeout
   const controller = new AbortController();
@@ -68,10 +67,10 @@ export async function apiRequest(path, options = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
+      credentials: "include",
       signal: controller.signal,
       headers: {
         ...(isFormData ? {} : { "Content-Type": "application/json" }),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
       },
     });

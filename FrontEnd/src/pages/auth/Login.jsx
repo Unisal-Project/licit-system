@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { User, Lock, Eye, EyeOff } from 'lucide-react'
 import "./Login.css"
 import { logo, male_laptop, name, lighting} from "../../assets/images/images.js"
@@ -8,51 +8,12 @@ import { toast } from "react-toastify"
 import { login, saveAuth } from "../../services/authService"
 
 function Login() {
-    const [email, setEmail] = useState("")
+    const [searchParams] = useSearchParams()
+    const [email, setEmail] = useState(() => searchParams.get("usuario") || "")
     const [senha, setSenha] = useState("")
     const [mostrarSenha, setMostrarSenha] = useState(false)
     const [lembrar, setLembrar] = useState(false)
     const navigate = useNavigate()
-    const [searchParams] = useSearchParams()
-
-    useEffect(() => {
-        const remoteUser = searchParams.get("usuario")
-
-        if (remoteUser) {
-            setEmail(remoteUser)
-        }
-
-        const remoteToken = searchParams.get("token")
-
-        if (!remoteToken) {
-            return
-        }
-
-        try {
-            const [, payloadPart] = remoteToken.split(".")
-            const normalizedPayload = payloadPart.replace(/-/g, "+").replace(/_/g, "/")
-            const paddedPayload = normalizedPayload.padEnd(
-                normalizedPayload.length + ((4 - normalizedPayload.length % 4) % 4),
-                "="
-            )
-            const payload = JSON.parse(atob(paddedPayload))
-
-            saveAuth({
-                access_token: remoteToken,
-                user: {
-                    id: Number(payload.sub || 0),
-                    nome: payload.nome || "Acesso remoto",
-                    email: payload.email,
-                    perfil: payload.perfil,
-                    remoto: Boolean(payload.remote),
-                    permanente: Boolean(payload.permanente),
-                },
-            })
-            navigate("/dashboard", { replace: true })
-        } catch {
-            toast.error("Link de acesso inválido.")
-        }
-    }, [navigate, searchParams])
 
     const enviar = async (event) => {
         event.preventDefault()

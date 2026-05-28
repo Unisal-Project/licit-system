@@ -1,19 +1,23 @@
 import jwt
 import datetime
 import os
+import uuid
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, Request, status
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "mudar-para-uma-chave-segura-em-producao")
-ALGORITMO  = os.getenv("ALGORITHM", "HS256")
-EXPIRACAO  = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "480"))
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY or len(SECRET_KEY) < 32:
+    raise RuntimeError("SECRET_KEY obrigatória e deve ter pelo menos 32 caracteres")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="v1/auth/login")
+ALGORITMO = os.getenv("ALGORITHM", "HS256")
+EXPIRACAO = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+JWT_ISSUER = os.getenv("JWT_ISSUER", "licit-system-api")
+JWT_AUDIENCE = os.getenv("JWT_AUDIENCE", "licit-system-web")
+AUTH_COOKIE_NAME = "access_token"
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
@@ -34,13 +38,19 @@ def verificar_senha(senha: str, senha_hash: str) -> bool:
 
 def criar_token(user_id: int, email: str, expiracao_minutos: int = None, adicional: dict = None) -> str:
     tempo_exp = EXPIRACAO if expiracao_minutos is None else expiracao_minutos
+    agora = datetime.datetime.now(datetime.timezone.utc)
     payload = {
         "sub": str(user_id),
         "email": email,
+        "iat": agora,
+        "nbf": agora,
+        "iss": JWT_ISSUER,
+        "aud": JWT_AUDIENCE,
+        "jti": uuid.uuid4().hex,
     }
 
     if tempo_exp > 0:
-        payload["exp"] = datetime.datetime.utcnow() + datetime.timedelta(minutes=tempo_exp)
+        payload["exp"] = agora + datetime.timedelta(minutes=tempo_exp)
 
     if adicional:
         payload.update(adicional)
@@ -50,16 +60,28 @@ def criar_token(user_id: int, email: str, expiracao_minutos: int = None, adicion
 def verificar_token(token: str) -> dict:
     """Lança exceção se o token for inválido ou expirado."""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITMO])
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITMO],
+            issuer=JWT_ISSUER,
+            audience=JWT_AUDIENCE,
+        )
         return payload
     except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido ou expirado",
-            headers={"WWW-Authenticate": "Bearer"},
         )
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+def get_current_user(request: Request) -> dict:
+    token = request.cookies.get(AUTH_COOKIE_NAME)
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Não autenticado",
+        )
+
     return verificar_token(token)
 
 def check_admin(current_user: dict = Depends(get_current_user)):

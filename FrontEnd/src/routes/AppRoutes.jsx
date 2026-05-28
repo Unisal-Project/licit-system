@@ -26,6 +26,7 @@ import {
     canAccessSettings,
     getCurrentUserRole,
 } from "../utils/permissions.js";
+import { isAuthenticated } from "../services/authService.js";
 
 function useUnsupportedPlatform() {
     const getIsUnsupported = () => {
@@ -77,9 +78,7 @@ function PermissionRoute({ children, canAccess, fallback = "/procurements" }) {
 }
 
 function ProtectedRoute({ children }) {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
+    if (!isAuthenticated()) {
         return <Navigate to="/login" replace />;
     }
 

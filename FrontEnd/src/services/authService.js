@@ -36,19 +36,23 @@ export async function generateRemoteAccess(payload) {
 }
 
 export function saveAuth(data) {
-  localStorage.setItem("token", data.access_token);
   localStorage.setItem("user", JSON.stringify(data.user));
   localStorage.removeItem("licit-system-current-role");
   sessionStorage.removeItem("licitSysSidebarActivePath");
 }
 
-export function getToken() {
-  return localStorage.getItem("token");
+export function isAuthenticated() {
+  return Boolean(localStorage.getItem("user"));
 }
 
 export function logout() {
-  localStorage.removeItem("token");
   localStorage.removeItem("user");
   localStorage.removeItem("licit-system-current-role");
   sessionStorage.removeItem("licitSysSidebarActivePath");
+
+  apiRequest("/auth/logout", {
+    method: "POST",
+  }).catch(() => {
+    // O estado local já foi limpo; falhas de rede não devem prender o usuário na sessão visual.
+  });
 }

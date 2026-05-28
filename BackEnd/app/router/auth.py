@@ -1,14 +1,39 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from app.schema.auth import ForgotPasswordRequest, LoginRequest, RemoteAccessRequest, RemoteAccessResponse, ResetPasswordRequest, TokenResponse, VisitorTokenRequest, VisitorTokenResponse
 from app.schema.user import UserCreate
 from app.service import auth as auth_service
-from app.utils.auth import check_admin
+from app.utils.auth import AUTH_COOKIE_NAME, check_admin
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/login", response_model=TokenResponse)
-def login(data: LoginRequest):
-    return auth_service.authenticate_user(data)
+def login(data: LoginRequest, response: Response):
+    result = auth_service.authenticate_user(data)
+    token = result.pop("access_token")
+    result.pop("token_type", None)
+
+    response.set_cookie(
+        key=AUTH_COOKIE_NAME,
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=1800,
+        path="/",
+    )
+
+    return result
+
+@router.post("/logout")
+def logout(response: Response):
+    response.delete_cookie(
+        key=AUTH_COOKIE_NAME,
+        path="/",
+        secure=True,
+        httponly=True,
+        samesite="strict",
+    )
+    return {"message": "Logout realizado com sucesso"}
 
 @router.post("/register")
 def register(data: UserCreate):
