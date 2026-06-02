@@ -71,6 +71,12 @@
     color: var(--text-secondary);
 }
 
+.dashboard-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
 .breadcrumb-ativo {
     color: var(--secondary);
     font-weight: 600;
@@ -199,7 +205,7 @@
 .tabela td {
     padding: 14px 24px;
     color: var(--text-primary);
-    font-size: 13px;
+    font-size: 12px;
     border-bottom: 1px solid var(--bg-light);
 }
 

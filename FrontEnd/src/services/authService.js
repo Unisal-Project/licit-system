@@ -1,9 +1,9 @@
 import { apiRequest } from "./api";
 
-export async function login(email, password) {
+export async function login(email, password, rememberMe = false) {
   return apiRequest("/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, remember_me: rememberMe }),
   });
 }
 

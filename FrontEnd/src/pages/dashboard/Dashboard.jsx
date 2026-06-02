@@ -23,7 +23,7 @@ function Dashboard() {
         setSummary(countProcurementsByStatus(updatedProcurements))
         setTotalProcurements(getTotalProcurements(updatedProcurements))
         setChartData(getProcurementsChartData(updatedProcurements))
-        setLatestProcurements(getLatestProcurements(updatedProcurements, 5))
+        setLatestProcurements(getLatestProcurements(updatedProcurements, 4))
       } catch (error) {
         console.error("Erro ao carregar dados do dashboard:", error)
 

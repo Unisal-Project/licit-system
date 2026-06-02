@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom"
 import { STATUS_BADGES } from "../../../services/procurementService"
-import { formatProcurementNumber, getProcurementOpeningDate, getProcurementOrigin, getProcurementStatus } from "../../../utils/procurementFormatters"
+import { formatProcurementNumber, getProcurementOpeningDate, getProcurementObjeto, getProcurementStatus } from "../../../utils/procurementFormatters"
 
 function ProcurementTable({ procurements = [], loading }) {
     const navigate = useNavigate()
-    const hasProcurements = procurements.length > 0
+    const visibleProcurements = procurements.slice(0, 4)
+    const hasProcurements = visibleProcurements.length > 0
 
     return (
         <div className="card tabela-card">
@@ -14,7 +15,7 @@ function ProcurementTable({ procurements = [], loading }) {
                 <thead>
                 <tr>
                     <th>Nº do Processo</th>
-                    <th>Origem</th>
+                    <th>Objeto</th>
                     <th>Status</th>
                     <th>Data de Abertura</th>
                 </tr>
@@ -38,7 +39,7 @@ function ProcurementTable({ procurements = [], loading }) {
                 )}
 
                 {!loading &&
-                    procurements.map((procurement) => {
+                    visibleProcurements.map((procurement) => {
                         const status = getProcurementStatus(procurement)
 
                         return (
@@ -48,7 +49,7 @@ function ProcurementTable({ procurements = [], loading }) {
                                 onClick={() => navigate(`/procurements/${procurement.id}`,{state: { from: "/dashboard"},})}
                             >
                                 <td>{formatProcurementNumber(procurement)}</td>
-                                <td>{getProcurementOrigin(procurement)}</td>
+                                <td>{getProcurementObjeto(procurement)}</td>
                                 <td>
                     <span
                         className={`status-dot ${

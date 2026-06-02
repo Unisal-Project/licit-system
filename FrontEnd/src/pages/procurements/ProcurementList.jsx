@@ -4,6 +4,7 @@ import { Search, Funnel, PlusCircle, ChevronLeft, ChevronRight } from "lucide-re
 import "./ProcurementList.css";
 import { useNavigate } from "react-router-dom";
 import { Button, Input } from "../../components/ui/main.js";
+import AppClock from "../../components/layout/AppClock.jsx";
 import { statusOptions, tipoOptions, origemOptions, filterProcurements, paginateItems, getStatusColor } from "../../components/shared/procurementListUtils.js";
 import { getCurrentProcurementStatus } from "../../components/shared/procurementDeadline.js"
 import { getAllProcurements, getDepartmentOptions } from "../../services/procurementService.js";
@@ -279,16 +280,23 @@ function ProcurementList() {
                         )}
                     </div>
 
-                    {canCreateProcurement && (
-                        <Button
-                            className="btn-New"
-                            variant="primary"
-                            onClick={irParaSelecao}
-                        >
-                            <PlusCircle size={18} />
-                            Nova Licitação
-                        </Button>
-                    )}
+                    <div className="top-bar-actions">
+                        <div className="procurement-clock-card">
+                            <span>Agora</span>
+                            <AppClock />
+                        </div>
+
+                        {canCreateProcurement && (
+                            <Button
+                                className="btn-New"
+                                variant="primary"
+                                onClick={irParaSelecao}
+                            >
+                                <PlusCircle size={32} />
+                                <span className="btn-new-label">Nova Licitação</span>
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="pagination-modern">
@@ -321,7 +329,7 @@ function ProcurementList() {
                         <tr>
                             <th>Número/Ano</th>
                             <th>Tipo</th>
-                            <th>Origem</th>
+                            <th>Objeto</th>
                             <th>Publicação</th>
                             <th>Abertura</th>
                             <th>Status</th>
@@ -347,9 +355,7 @@ function ProcurementList() {
                                     >
                                         <td>{item.numero}/{item.ano}</td>
                                         <td>{getOptionLabel(PROCUREMENT_TYPES, item.tipo)}</td>
-                                        <td title={getOptionLabel(SECRETARIAS, item.origem)}>
-                                            {item.origem}
-                                        </td>
+                                        <td title={item.objeto} className="objeto-list">{item.objeto}</td>
                                         <td>{item.publicacao}</td>
                                         <td>{item.abertura}</td>
                                         <td>

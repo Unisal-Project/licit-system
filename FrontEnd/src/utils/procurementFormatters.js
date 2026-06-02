@@ -10,8 +10,8 @@ export function getProcurementOpeningDate(procurement) {
     return procurement?.abertura ?? "Não informado"
 }
 
-export function getProcurementOrigin(procurement) {
-    return procurement?.origem ?? "Não informado"
+export function getProcurementObjeto(procurement) {
+    return procurement?.objeto ?? "Não informado"
 }
 
 export function getProcurementStatus(procurement) {

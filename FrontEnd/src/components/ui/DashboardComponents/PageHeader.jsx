@@ -1,5 +1,6 @@
 import { Home, ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
+import AppClock from "../../layout/AppClock"
 
 function PageHeader() {
     return (
@@ -15,12 +16,16 @@ function PageHeader() {
                 </div>
             </div>
 
-            <div className="breadcrumb">
-                <Home size={14} />
-                <span>/</span>
-                <span>Licitações</span>
-                <span>/</span>
-                <span className="breadcrumb-ativo">Dashboard</span>
+            <div className="dashboard-header-actions">
+                <AppClock />
+
+                <div className="breadcrumb">
+                    <Home size={14} />
+                    <span>/</span>
+                    <span>Licitações</span>
+                    <span>/</span>
+                    <span className="breadcrumb-ativo">Dashboard</span>
+                </div>
             </div>
         </div>
     )

@@ -24,12 +24,22 @@ html, body {
 .top-bar {
     position: relative;
     margin-left: 190px;
+    width: calc(100% - 230px);
     margin-top: 30px;
     display: flex;
+    align-items: center;
     gap: 10px;
     margin-bottom: 20px;
     z-index: 10000;
     animation: procurement-soft-enter 0.38s ease both;
+}
+
+.top-bar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 .filter-btn {
@@ -148,14 +158,35 @@ html, body {
 .btn.btn-New {
     height: 80px;
     padding: 0 24px;
-    border-radius: 20px;
+    border-radius: 100px;
     background: var(--secondary);
     color: var(--bg);
     font-size: 24px;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: 900px;
+    margin-left: 0;
+}
+
+.procurement-clock-card {
+    height: 80px;
+    padding: 12px 14px;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    border-radius: 16px;
+    background: #eff6ff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.procurement-clock-card > span {
+    color: var(--secondary);
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
 .input-search {
@@ -376,6 +407,14 @@ tbody tr {
   transform: translateX(4px);
 }
 
+.objeto-list {
+    max-width: 400px;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @keyframes procurement-soft-enter {
     from {
         opacity: 0;
@@ -413,12 +452,17 @@ tbody tr {
 }
 
 @media (max-width: 1440px) {
+    .top-bar {
+        margin-left: 150px;
+        width: calc(100% - 170px);
+        margin-top: 20px;
+        align-items: flex-start;
+    }
+
     .input-search {
-        width: auto;
+        width: 300px;
         height: 50px;
         position: relative;
-        left: -40px;
-        top: -20px;
     }
 
     .input-search i{
@@ -438,8 +482,6 @@ tbody tr {
 
     .filter-container{
         position: relative;
-        left: -40px;
-        top: -20px;
     }
 
     .filter-btn {
@@ -503,16 +545,31 @@ tbody tr {
     }
 
     .btn.btn-New {
-        width: auto;
+        width: 55px;
+        min-width: 55px;
         height: 55px;
-        font-size: 18px;
-        border-radius: 10px;
+        padding: 0;
+        font-size: 0;
+        border-radius: 50%;
         display: flex;
         align-items: center;
-        gap: 8px;
-        position: relative;
-        left: -390px;
-        top: -20px;
+        justify-content: center;
+        gap: 0;
+        margin-right: 440px;
+    }
+
+    .btn.btn-New .btn-new-label {
+        display: none;
+    }
+
+    .procurement-clock-card {
+        height: 55px;
+        padding: 7px 10px;
+        border-radius: 10px;
+    }
+
+    .procurement-clock-card > span {
+        font-size: 10px;
     }
 
     .page-controls, .page-info{
@@ -533,7 +590,7 @@ tbody tr {
 
     .table-container {
         width: 66%;
-        height: 70%;
+        height: 75%;
         position: relative;
         left: -40px;
         top: -40px;

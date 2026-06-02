@@ -1,13 +1,27 @@
 from fastapi import APIRouter, Depends, Request, Response
+import os
 from app.schema.auth import ForgotPasswordRequest, LoginRequest, RemoteAccessRequest, RemoteAccessResponse, ResetPasswordRequest, TokenResponse, VisitorTokenRequest, VisitorTokenResponse
 from app.schema.user import UserCreate
 from app.service import auth as auth_service
-from app.utils.auth import AUTH_COOKIE_NAME, check_admin
+from app.utils.auth import AUTH_COOKIE_NAME, EXPIRACAO, REMEMBER_ME_EXPIRACAO, check_admin
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
+def use_secure_cookie(request: Request) -> bool:
+    configured_value = os.getenv("AUTH_COOKIE_SECURE")
+
+    if configured_value is not None:
+        return configured_value.lower() == "true"
+
+    return request.url.scheme == "https"
+
+def get_cookie_max_age(remember_me: bool) -> int:
+    expiration_minutes = REMEMBER_ME_EXPIRACAO if remember_me else EXPIRACAO
+
+    return expiration_minutes * 60
+
 @router.post("/login", response_model=TokenResponse)
-def login(data: LoginRequest, response: Response):
+def login(data: LoginRequest, request: Request, response: Response):
     result = auth_service.authenticate_user(data)
     token = result.pop("access_token")
     result.pop("token_type", None)
@@ -16,20 +30,20 @@ def login(data: LoginRequest, response: Response):
         key=AUTH_COOKIE_NAME,
         value=token,
         httponly=True,
-        secure=True,
+        secure=use_secure_cookie(request),
         samesite="strict",
-        max_age=1800,
+        max_age=get_cookie_max_age(data.remember_me),
         path="/",
     )
 
     return result
 
 @router.post("/logout")
-def logout(response: Response):
+def logout(request: Request, response: Response):
     response.delete_cookie(
         key=AUTH_COOKIE_NAME,
         path="/",
-        secure=True,
+        secure=use_secure_cookie(request),
         httponly=True,
         samesite="strict",
     )

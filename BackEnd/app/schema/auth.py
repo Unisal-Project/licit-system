@@ -5,6 +5,7 @@ from typing import Optional
 class LoginRequest(BaseModel):
     email: str
     password: str
+    remember_me: bool = False
 
 class ForgotPasswordRequest(BaseModel):
     email: str

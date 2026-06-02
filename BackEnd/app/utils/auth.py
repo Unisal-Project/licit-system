@@ -15,6 +15,7 @@ if not SECRET_KEY or len(SECRET_KEY) < 32:
 
 ALGORITMO = os.getenv("ALGORITHM", "HS256")
 EXPIRACAO = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+REMEMBER_ME_EXPIRACAO = int(os.getenv("REMEMBER_ME_EXPIRE_MINUTES", str(60 * 24 * 30)))
 JWT_ISSUER = os.getenv("JWT_ISSUER", "licit-system-api")
 JWT_AUDIENCE = os.getenv("JWT_AUDIENCE", "licit-system-web")
 AUTH_COOKIE_NAME = "access_token"

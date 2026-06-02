@@ -19,7 +19,7 @@ function Login() {
         event.preventDefault()
 
         try {
-            const data = await login(email, senha)
+            const data = await login(email, senha, lembrar)
             saveAuth(data)
             navigate("/dashboard")
         } catch (error) {

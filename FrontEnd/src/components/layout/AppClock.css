@@ -1,0 +1,38 @@
+.app-clock {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 156px;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid rgba(37, 99, 235, 0.22);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text-primary);
+    pointer-events: none;
+}
+
+.app-clock svg {
+    flex-shrink: 0;
+    color: var(--secondary);
+}
+
+.app-clock time {
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+@media (max-width: 1440px) {
+    .app-clock {
+        width: 140px;
+        gap: 6px;
+        padding: 0 8px;
+    }
+
+    .app-clock time {
+        font-size: 12px;
+    }
+}

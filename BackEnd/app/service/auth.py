@@ -297,6 +297,7 @@ def authenticate_user(data: LoginRequest):
         token = auth_utils.criar_token(
             user["id"], 
             user["email"], 
+            expiracao_minutos=auth_utils.REMEMBER_ME_EXPIRACAO if data.remember_me else None,
             adicional={"perfil": user["perfil"]}
         )
         

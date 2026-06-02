@@ -19,7 +19,7 @@ cors_origins = [
 ]
 cors_origin_regex = os.getenv(
     "CORS_ORIGIN_REGEX",
-    r"https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|[\w.-]+):(?:3000|5173)"
+    r"https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|[\w.-]+)(?::\d+)?"
 )
 
 # Configuração de CORS
