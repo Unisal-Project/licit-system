@@ -1,30 +1,574 @@
-# LicitSystem
+<div align="center">
 
-Sistema web para gerenciamento de licitações, usuários, permissões, anexos e acessos remotos.
+# 🏛️ LicitSys
 
-O projeto é dividido em:
+### Plataforma de Gestão de Licitações para Órgãos Públicos
 
-- `BackEnd`: API REST em FastAPI com MySQL.
-- `FrontEnd`: aplicação React com Vite.
-- `BackEnd/init-db`: script SQL de criação e carga inicial do banco.
-- `docker-compose.yml`: ambiente completo com banco, API e frontend.
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white)]()
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat-square&logo=fastapi&logoColor=white)]()
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat-square&logo=mysql&logoColor=white)]()
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)]()
+[![JWT](https://img.shields.io/badge/Auth-JWT-orange?style=flat-square)]()
 
-## Sumário
+<br>
 
-- [Funcionalidades](#funcionalidades)
-- [Tecnologias](#tecnologias)
-- [Arquitetura](#arquitetura)
-- [Pré-requisitos](#pré-requisitos)
-- [Configuração](#configuração)
-- [Execução com Docker](#execução-com-docker)
-- [Execução local](#execução-local)
-- [Acessos e permissões](#acessos-e-permissões)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Banco de dados](#banco-de-dados)
-- [API](#api)
-- [Frontend](#frontend)
-- [Uploads](#uploads)
-- [Troubleshooting](#troubleshooting)
+> Sistema desenvolvido para modernizar e digitalizar o gerenciamento de licitações públicas,
+> centralizando processos, documentos, usuários e indicadores em uma única plataforma.
+
+💡 **Documentação da API:** `http://localhost:8000/docs`
+
+</div>
+
+---
+
+# 📋 Sumário
+
+- [Sobre o Projeto](#-sobre-o-projeto)
+- [Funcionalidades](#-funcionalidades)
+- [Tecnologias](#️-tecnologias)
+- [Arquitetura](#️-arquitetura)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Pré-requisitos](#-pré-requisitos)
+- [Configuração](#️-configuração)
+- [Execução com Docker](#-execução-com-docker)
+- [Execução Local](#-execução-local)
+- [Controle de Acesso](#-controle-de-acesso)
+- [Banco de Dados](#️-banco-de-dados)
+- [API](#-api)
+- [Frontend](#️-frontend)
+- [Uploads](#-uploads)
+- [Scripts Úteis](#-scripts-úteis)
+- [Troubleshooting](#-troubleshooting)
+
+---
+
+# 🎯 Sobre o Projeto
+
+O **LicitSys** é uma plataforma web desenvolvida para auxiliar órgãos públicos no gerenciamento de processos licitatórios.
+
+O sistema surgiu como um projeto extensionista universitário em parceria com a Prefeitura Municipal de Cruzeiro-SP, com o objetivo de substituir processos manuais, documentos físicos e controles descentralizados por uma solução digital moderna e segura.
+
+A plataforma permite:
+
+- Centralização de informações;
+- Gestão de processos licitatórios;
+- Controle de usuários e permissões;
+- Armazenamento de documentos;
+- Indicadores gerenciais;
+- Acompanhamento do ciclo completo das licitações.
+
+---
+
+# ✨ Funcionalidades
+
+## 🔐 Segurança e Controle de Acesso
+
+- Autenticação JWT
+- Controle de permissões por perfil
+- Recuperação de senha por token
+- Sessões protegidas
+- Controle de acessos remotos
+
+## 📋 Gestão de Licitações
+
+- Cadastro de licitações
+- Edição de processos
+- Exclusão de registros
+- Visualização detalhada
+- Histórico de alterações
+- Controle de status
+
+## 📂 Gestão de Documentos
+
+- Upload de anexos
+- Download de arquivos
+- Organização documental
+- Vinculação por processo
+
+## 👥 Gestão de Usuários
+
+- Cadastro de usuários
+- Controle de perfis
+- Administração de permissões
+- Controle de acessos
+
+## 📊 Dashboard Gerencial
+
+- Estatísticas em tempo real
+- Indicadores operacionais
+- Últimas licitações cadastradas
+- Resumo geral do sistema
+
+---
+
+# 🛠️ Tecnologias
+
+## Backend
+
+- Python 3.11
+- FastAPI
+- Uvicorn
+- Pydantic
+- JWT Authentication
+- Passlib / Bcrypt
+- MySQL Connector
+- Python Multipart
+
+## Frontend
+
+- React 19
+- Vite
+- React Router
+- React Select
+- React Toastify
+- Lucide React
+- Bootstrap Icons
+
+## Banco de Dados
+
+- MySQL 8.0
+
+## Infraestrutura
+
+- Docker
+- Docker Compose
+
+---
+
+# 🏗️ Arquitetura
+
+O sistema segue uma arquitetura em camadas visando:
+
+- Escalabilidade
+- Manutenibilidade
+- Separação de responsabilidades
+- Facilidade de testes
+
+```text
+Frontend (React)
+        │
+        ▼
+API REST (FastAPI)
+        │
+ ┌──────┼──────┐
+ ▼      ▼      ▼
+Router Service Repository
+        │
+        ▼
+      MySQL
+```
+
+## Fluxo de Autenticação
+
+```text
+Usuário
+   │
+   ▼
+Login
+   │
+   ▼
+FastAPI
+   │
+   ▼
+JWT Token
+   │
+   ▼
+Frontend armazena token
+   │
+   ▼
+Authorization: Bearer <token>
+```
+
+---
+
+# 📁 Estrutura do Projeto
+
+```text
+.
+├── BackEnd/
+│   ├── app/
+│   │   ├── core/
+│   │   ├── repository/
+│   │   ├── router/
+│   │   ├── schema/
+│   │   ├── service/
+│   │   ├── utils/
+│   │   └── main.py
+│   │
+│   ├── init-db/
+│   │   └── init.sql
+│   │
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── FrontEnd/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── styles/
+│   │   └── utils/
+│   │
+│   ├── Dockerfile
+│   ├── package.json
+│   └── vite.config.js
+│
+├── docs/
+├── uploads/
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
+
+---
+
+# 📦 Pré-requisitos
+
+## Docker
+
+- Docker
+- Docker Compose
+
+## Ambiente Local
+
+- Python 3.11+
+- Node.js 20+
+- npm
+- MySQL 8+
+
+---
+
+# ⚙️ Configuração
+
+Clone o repositório:
+
+```bash
+git clone https://github.com/Unisal-Project/licit-system.git
+
+cd licit-system
+```
+
+Crie o arquivo `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Exemplo:
+
+```env
+DB_HOST=db
+DB_PORT=3306
+DB_USER=user
+DB_PASSWORD=password
+DB_NAME=licit_system
+
+SECRET_KEY=sua_chave_jwt
+
+ACCESS_TOKEN_EXPIRE_MINUTES=480
+
+FRONTEND_URL=http://localhost:5173
+
+VITE_API_BASE_URL=http://localhost:8000/v1
+```
+
+---
+
+# 🐳 Execução com Docker
+
+Subir ambiente completo:
+
+```bash
+docker compose up --build
+```
+
+Serviços disponíveis:
+
+| Serviço | URL |
+|----------|----------|
+| Frontend | http://localhost:5173 |
+| API | http://localhost:8000 |
+| Swagger | http://localhost:8000/docs |
+| MySQL | localhost:3307 |
+
+Parar ambiente:
+
+```bash
+docker compose down
+```
+
+Recriar banco:
+
+```bash
+docker compose down -v
+
+docker compose up --build
+```
+
+---
+
+# 💻 Execução Local
+
+## Banco de Dados
+
+```bash
+mysql -u root -p < BackEnd/init-db/init.sql
+```
+
+---
+
+## Backend
+
+```bash
+cd BackEnd
+
+python -m venv .venv
+
+source .venv/bin/activate
+
+pip install -r requirements.txt
+
+uvicorn app.main:app \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --reload
+```
+
+---
+
+## Frontend
+
+```bash
+cd FrontEnd
+
+npm install
+
+npm run dev
+```
+
+---
+
+# 👥 Controle de Acesso
+
+O sistema trabalha com quatro níveis de permissão.
+
+| Perfil | Permissões |
+|----------|----------|
+| suporte | Controle total do sistema |
+| admin | Gestão administrativa |
+| editor | Gerenciamento de licitações |
+| visitante | Apenas visualização |
+
+---
+
+# 🗄️ Banco de Dados
+
+Banco padrão:
+
+```text
+licit_system
+```
+
+## Principais Tabelas
+
+| Tabela | Finalidade |
+|----------|----------|
+| usuarios | Usuários do sistema |
+| licitacoes | Processos licitatórios |
+| categorias | Categorias |
+| secretarias | Secretarias |
+| anexos | Arquivos anexados |
+| licitacao_logs | Histórico |
+| convites | Acessos remotos |
+| password_reset_tokens | Recuperação de senha |
+
+---
+
+# 📡 API
+
+Todos os endpoints utilizam:
+
+```text
+/v1
+```
+
+## Principais Módulos
+
+```text
+/v1/auth
+/v1/users
+/v1/biddings
+/v1/attachments
+/v1/departments
+/v1/categories
+/v1/dashboard
+```
+
+Documentação interativa:
+
+```text
+http://localhost:8000/docs
+```
+
+---
+
+# 🖥️ Frontend
+
+## Rotas Principais
+
+| Rota | Descrição |
+|----------|----------|
+| /login | Login |
+| /register | Cadastro |
+| /forgot-password | Recuperação de senha |
+| /dashboard | Dashboard |
+| /procurements | Lista de licitações |
+| /procurements/create | Nova licitação |
+| /procurements/edit/:id | Editar licitação |
+| /procurements/:id | Detalhes |
+| /remote-access | Acesso remoto |
+| /users | Gestão de usuários |
+
+---
+
+# 📂 Uploads
+
+Os arquivos são armazenados em:
+
+```text
+/uploads
+```
+
+Download:
+
+```text
+/v1/attachments/{attachment_id}/download
+```
+
+---
+
+# 🚀 Scripts Úteis
+
+## Frontend
+
+```bash
+npm run dev
+
+npm run build
+
+npm run lint
+
+npm run preview
+```
+
+## Backend
+
+```bash
+uvicorn app.main:app --reload
+```
+
+## Docker
+
+```bash
+docker compose up --build
+
+docker compose down
+
+docker compose logs -f api
+
+docker compose logs -f frontend
+
+docker compose logs -f db
+```
+
+---
+
+# 🔧 Troubleshooting
+
+## API não conecta ao banco
+
+Verifique:
+
+```env
+DB_HOST
+DB_PORT
+DB_USER
+DB_PASSWORD
+DB_NAME
+```
+
+Docker:
+
+```env
+DB_HOST=db
+DB_PORT=3306
+```
+
+Local:
+
+```env
+DB_HOST=localhost
+DB_PORT=3307
+```
+
+---
+
+## Frontend não encontra API
+
+Verifique:
+
+```env
+VITE_API_BASE_URL
+```
+
+Exemplo:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000/v1
+```
+
+---
+
+## Recuperação de senha não envia e-mail
+
+Configure:
+
+```env
+SMTP_HOST
+SMTP_PORT
+SMTP_USER
+SMTP_PASSWORD
+SMTP_FROM
+SMTP_USE_TLS
+```
+
+---
+
+## Alterei o init.sql e nada mudou
+
+O script roda apenas na criação do volume.
+
+Recrie o banco:
+
+```bash
+docker compose down -v
+
+docker compose up --build
+```
+
+---
+
+<div align="center">
+
+### 🏛️ LicitSys
+
+Sistema desenvolvido para modernizar e digitalizar a gestão de licitações públicas.
+
+**Projeto Extensionista • UNISAL • Prefeitura Municipal de Cruzeiro**
+
+</div>
 
 ## Funcionalidades
 
